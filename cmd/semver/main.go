@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -23,7 +24,8 @@ func showHelp() {
 }
 
 func show(ver *semver.Version) {
-	fmt.Println(*ver)
+	bytes, _ := json.Marshal(ver)
+	fmt.Println(string(bytes))
 }
 
 func main() {

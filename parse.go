@@ -1,6 +1,7 @@
 package semver
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -25,11 +26,11 @@ var validNumeric = regexp.MustCompile(validNumericRegexp)
 
 // Version is xxx.
 type Version struct {
-	Major      uint64
-	Minor      uint64
-	Patch      uint64
-	PreRelease []PreReleaseID
-	Build      []BuildID
+	Major      uint64         `json:"major"`
+	Minor      uint64         `json:"minor"`
+	Patch      uint64         `json:"patch"`
+	PreRelease []PreReleaseID `json:"prerelease,omitempty"`
+	Build      []BuildID      `json:"build,omitempty"`
 }
 
 // IsPreRelease is xxx.
@@ -42,20 +43,38 @@ func (v *Version) IsPreRelease() bool {
 
 // PreReleaseID is xxx.
 type PreReleaseID struct {
-	Str string
-	Num uint64
+	String string
+	Number uint64
+}
+
+type preReleaseIDString struct {
+	String string `json:"string"`
+}
+
+type preReleaseIDNumber struct {
+	Number uint64 `json:"number"`
+}
+
+// IsNumber is xxx.
+func (pr *PreReleaseID) IsNumber() bool {
+	if pr.String == "" {
+		return true
+	}
+	return false
+}
+
+// MarshalJSON is xxx.
+func (pr PreReleaseID) MarshalJSON() ([]byte, error) {
+	if pr.IsNumber() {
+		tmp := preReleaseIDNumber{Number: pr.Number}
+		return json.Marshal(tmp)
+	}
+	tmp := preReleaseIDString{String: pr.String}
+	return json.Marshal(tmp)
 }
 
 // BuildID is xxx.
 type BuildID string
-
-// IsNum is xxx.
-func (pr *PreReleaseID) IsNum() bool {
-	if pr.Str != "" {
-		return false
-	}
-	return true
-}
 
 func parseUint(str string) uint64 {
 	num, _ := strconv.ParseUint(str, 10, 64)
@@ -74,9 +93,9 @@ func parsePreRelease(str string) []PreReleaseID {
 	ids := make([]PreReleaseID, len(tmp))
 	for i, str := range tmp {
 		if isValidNumber(str) {
-			ids[i].Num = parseUint(str)
+			ids[i].Number = parseUint(str)
 		} else {
-			ids[i].Str = str
+			ids[i].String = str
 		}
 	}
 	return ids

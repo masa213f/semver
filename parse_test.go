@@ -22,12 +22,12 @@ func equal(t *testing.T, o1, o2 *Version) bool {
 		return false
 	}
 	for i := range o1.PreRelease {
-		if o1.PreRelease[i].Str != o2.PreRelease[i].Str {
-			t.Log("pre.Str", i, o1.PreRelease[i].Str, o2.PreRelease[i].Str)
+		if o1.PreRelease[i].String != o2.PreRelease[i].String {
+			t.Log("pre.String", i, o1.PreRelease[i].String, o2.PreRelease[i].String)
 			return false
 		}
-		if o1.PreRelease[i].Num != o2.PreRelease[i].Num {
-			t.Log("pre.Num", i, o1.PreRelease[i].Num, o2.PreRelease[i].Num)
+		if o1.PreRelease[i].Number != o2.PreRelease[i].Number {
+			t.Log("pre.Number", i, o1.PreRelease[i].Number, o2.PreRelease[i].Number)
 			return false
 		}
 	}
@@ -77,7 +77,7 @@ func TestParseOK(t *testing.T) {
 			input: "0.0.0-0",
 			expected: Version{
 				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{Num: 0}},
+				PreRelease: []PreReleaseID{{Number: 0}},
 				Build:      []BuildID{},
 			},
 		},
@@ -85,7 +85,7 @@ func TestParseOK(t *testing.T) {
 			input: "0.0.0-rc.1",
 			expected: Version{
 				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{Str: "rc"}, {Num: 1}},
+				PreRelease: []PreReleaseID{{String: "rc"}, {Number: 1}},
 				Build:      []BuildID{},
 			},
 		},
@@ -93,7 +93,7 @@ func TestParseOK(t *testing.T) {
 			input: "0.0.0-00.01.10.11.aaa.bbb",
 			expected: Version{
 				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{Str: "00"}, {Str: "01"}, {Num: 10}, {Num: 11}, {Str: "aaa"}, {Str: "bbb"}},
+				PreRelease: []PreReleaseID{{String: "00"}, {String: "01"}, {Number: 10}, {Number: 11}, {String: "aaa"}, {String: "bbb"}},
 				Build:      []BuildID{},
 			},
 		},
@@ -109,7 +109,7 @@ func TestParseOK(t *testing.T) {
 			input: "123.456.789-123.456.789.0ab.cde+123.456.789.0ab.cde",
 			expected: Version{
 				Major: 123, Minor: 456, Patch: 789,
-				PreRelease: []PreReleaseID{{Num: 123}, {Num: 456}, {Num: 789}, {Str: "0ab"}, {Str: "cde"}},
+				PreRelease: []PreReleaseID{{Number: 123}, {Number: 456}, {Number: 789}, {String: "0ab"}, {String: "cde"}},
 				Build:      []BuildID{"123", "456", "789", "0ab", "cde"},
 			},
 		},

@@ -1,19 +1,20 @@
 VERSION = 0.1.0
 TARGET = semver
+SOURCE = parse.go cmd/$(TARGET)/main.go
 
 all: build
 
-mod: go.mod
+mod:
 	go mod tidy
 	go mod vendor
 
 build: mod $(TARGET)
 
-$(TARGET):
+$(TARGET): $(SOURCE)
 	go build -o $(TARGET) -ldflags "-X main.version=$(VERSION)" ./cmd/$(TARGET)/...
 
 run: build
-	-./$(TARGET) "0.0.0-rc.0"
+	-./$(TARGET) "0.0.0-rc.0+20190925"
 
 clean:
 	-rm $(TARGET)
