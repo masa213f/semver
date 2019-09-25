@@ -12,10 +12,11 @@ import (
 )
 
 const (
-	exitStatusSuccess        = 0
-	exitStatusParseFailure   = 2
-	exitStatusInvalidOptions = 3
-	exitStatusInternalError  = 5
+	exitStatusSuccess          = 0
+	exitStatusParseFailure     = 1
+	exitStagusConditionFailure = 2
+	exitStatusInvalidOption    = 3
+	exitStatusInternalError    = 4
 )
 
 var (
@@ -37,7 +38,7 @@ Copyright 2019 xxx.
 	fmt.Fprintf(o, usage)
 }
 
-func show(ver *semver.Version) {
+func show(o io.Writer, ver *semver.Version) {
 	bytes, _ := json.Marshal(ver)
 	fmt.Println(string(bytes))
 }
@@ -46,7 +47,7 @@ func main() {
 	opt, err := parseOptions(os.Args[1:])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		os.Exit(exitStatusInvalidOptions)
+		os.Exit(exitStatusInvalidOption)
 	}
 
 	if opt.showVersion {
@@ -74,6 +75,17 @@ func main() {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(exitStatusParseFailure)
 	}
-	show(ver)
+
+	if opt.isConditionCheck() {
+		if opt.isPreRelease && !ver.IsPreRelease() {
+			fmt.Fprintf(os.Stderr, "%s is not pre-release\n", target)
+			os.Exit(exitStagusConditionFailure)
+		}
+		if opt.hasBuildMeta && !ver.HasBuildMeta() {
+			fmt.Fprintf(os.Stderr, "%s does not have build metadata\n", target)
+			os.Exit(exitStagusConditionFailure)
+		}
+	}
+	show(os.Stdout, ver)
 	os.Exit(exitStatusSuccess)
 }

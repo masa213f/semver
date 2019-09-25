@@ -41,6 +41,14 @@ func (v *Version) IsPreRelease() bool {
 	return true
 }
 
+// HasBuildMeta is xxx.
+func (v *Version) HasBuildMeta() bool {
+	if len(v.Build) == 0 {
+		return false
+	}
+	return true
+}
+
 // PreReleaseID is xxx.
 type PreReleaseID struct {
 	String string

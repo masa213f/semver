@@ -10,8 +10,15 @@ type options struct {
 	showVersion  bool
 	showUsage    bool
 	isPreRelease bool
-	hasBuildTag  bool
+	hasBuildMeta bool
 	target       string
+}
+
+func (opt *options) isConditionCheck() bool {
+	if opt.isPreRelease || opt.hasBuildMeta {
+		return true
+	}
+	return false
 }
 
 func parseOptions(args []string) (*options, error) {
@@ -23,8 +30,8 @@ func parseOptions(args []string) (*options, error) {
 	opt := options{}
 	flagSet.BoolVar(&opt.showVersion, "v", false, "version")
 	flagSet.BoolVar(&opt.showUsage, "h", false, "help")
-	flagSet.BoolVar(&opt.isPreRelease, "-p", false, "pre-release")
-	flagSet.BoolVar(&opt.hasBuildTag, "-b", false, "build")
+	flagSet.BoolVar(&opt.isPreRelease, "p", false, "pre-release")
+	flagSet.BoolVar(&opt.hasBuildMeta, "b", false, "build")
 
 	err := flagSet.Parse(args)
 	if err != nil {
