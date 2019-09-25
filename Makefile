@@ -1,6 +1,6 @@
 VERSION = 0.1.0
 TARGET = semver
-SOURCE = parse.go cmd/$(TARGET)/main.go
+SOURCE = $(shell find . -type f -name "*.go" -not -name "*_test.go")
 
 all: build
 
