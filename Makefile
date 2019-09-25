@@ -14,7 +14,7 @@ $(TARGET): $(SOURCE)
 	go build -o $(TARGET) -ldflags "-X main.version=$(VERSION)" ./cmd/$(TARGET)/...
 
 run: build
-	-./$(TARGET) "0.0.0-rc.0+20190925"
+	-./$(TARGET) "v0.0.0-rc.0+20190925"
 
 clean:
 	-rm $(TARGET)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/masa213f/semver"
@@ -58,9 +59,19 @@ func main() {
 		os.Exit(exitStatusSuccess)
 	}
 
-	ver, err := semver.Parse(strings.TrimSpace(opt.target))
+	// Remove prefix. Ex "v1.2.3" => "1.2.3"
+	re := regexp.MustCompile("^([^0-9]*)([0-9].*)$")
+	submatch := re.FindStringSubmatch(strings.TrimSpace(opt.target))
+	if len(submatch) != 3 {
+		fmt.Fprintln(os.Stderr, "parse error")
+		os.Exit(exitStatusParseFailure)
+	}
+	// prefix := submatch[1]
+	target := submatch[2]
+
+	ver, err := semver.Parse(target)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(exitStatusParseFailure)
 	}
 	show(ver)
