@@ -2,25 +2,38 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"github.com/masa213f/semver"
 )
 
-var (
-	version         string
-	showVersionFlag = flag.Bool("v", false, "version")
-	showHelpFlag    = flag.Bool("h", false, "help")
+const (
+	exitStatusSuccess        = 0
+	exitStatusParseFailure   = 2
+	exitStatusInvalidOptions = 3
+	exitStatusInternalError  = 5
 )
 
-func showVersion() {
-	fmt.Println(version)
+var (
+	version string
+)
+
+func showVersion(o io.Writer) {
+	fmt.Fprintln(o, version)
 }
 
-func showHelp() {
-	fmt.Println("T.B.D.")
+func showUsage(o io.Writer) {
+	const usage = `
+Usage: semver
+
+T.B.D.
+
+Copyright 2019 xxx.
+`
+	fmt.Fprintf(o, usage)
 }
 
 func show(ver *semver.Version) {
@@ -29,28 +42,27 @@ func show(ver *semver.Version) {
 }
 
 func main() {
-	flag.Parse()
-
-	if *showVersionFlag {
-		showVersion()
-		os.Exit(0)
+	opt, err := parseOptions(os.Args[1:])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+		os.Exit(exitStatusInvalidOptions)
 	}
 
-	if *showHelpFlag {
-		showHelp()
-		os.Exit(0)
+	if opt.showVersion {
+		showVersion(os.Stdout)
+		os.Exit(exitStatusSuccess)
 	}
 
-	args := flag.Args()
-	if len(args) != 1 {
-		showHelp()
-		os.Exit(1)
+	if opt.showUsage {
+		showUsage(os.Stdout)
+		os.Exit(exitStatusSuccess)
 	}
 
-	ver, err := semver.Parse(args[0])
+	ver, err := semver.Parse(strings.TrimSpace(opt.target))
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(1)
+		os.Exit(exitStatusParseFailure)
 	}
 	show(ver)
+	os.Exit(exitStatusSuccess)
 }
