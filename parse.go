@@ -11,14 +11,15 @@ import (
 const (
 	digitRegexp        = "0|[1-9][0-9]{0,15}"
 	alnumRegexp        = "[0-9A-Za-z-]{1,16}"
+	prefixRegexp       = "[^0-9]{0,16}"
 	versionCoreRegexp  = "(" + digitRegexp + ")\\.(" + digitRegexp + ")\\.(" + digitRegexp + ")"
 	preReleaseRegexp   = "(" + alnumRegexp + "(\\." + alnumRegexp + "){0,5})"
 	buildRegexp        = "(" + alnumRegexp + "(\\." + alnumRegexp + "){0,5})"
-	validVersionRegexp = "^" + versionCoreRegexp + "(-" + preReleaseRegexp + ")?" + "(\\+" + buildRegexp + ")?$"
+	validVersionRegexp = "^(" + prefixRegexp + ")(" + versionCoreRegexp + "(-" + preReleaseRegexp + ")?" + "(\\+" + buildRegexp + ")?)$"
 	validNumericRegexp = "^(" + digitRegexp + ")$"
 
-	// <Mmajor:Max16>.<Minor:Max16>.<Patch:Max16>-<PreRelease1:Max16>.(snip).<PreRelease6:Max16>+<Build1:Max16>.(snip).<Build6:Max16>
-	maxInputLength = 254
+	// <Prefix:Max16><Mmajor:Max16>.<Minor:Max16>.<Patch:Max16>-<PreRelease1:Max16>.(snip).<PreRelease6:Max16>+<Build1:Max16>.(snip).<Build6:Max16>
+	maxInputLength = 270
 )
 
 var validVersion = regexp.MustCompile(validVersionRegexp)
@@ -26,6 +27,8 @@ var validNumeric = regexp.MustCompile(validNumericRegexp)
 
 // Version is xxx.
 type Version struct {
+	Prefix     string         `json:"prefix"`
+	Version    string         `json:"version"`
 	Major      uint64         `json:"major"`
 	Minor      uint64         `json:"minor"`
 	Patch      uint64         `json:"patch"`
@@ -134,10 +137,12 @@ func Parse(str string) (*Version, error) {
 	// 	fmt.Println(">", i, v)
 	// }
 	ver := &Version{}
-	ver.Major = parseUint(submatch[1])
-	ver.Minor = parseUint(submatch[2])
-	ver.Patch = parseUint(submatch[3])
-	ver.PreRelease = parsePreRelease(submatch[5])
-	ver.Build = parseBuild(submatch[8])
+	ver.Prefix = submatch[1]
+	ver.Version = submatch[2]
+	ver.Major = parseUint(submatch[3])
+	ver.Minor = parseUint(submatch[4])
+	ver.Patch = parseUint(submatch[5])
+	ver.PreRelease = parsePreRelease(submatch[7])
+	ver.Build = parseBuild(submatch[10])
 	return ver, nil
 }
