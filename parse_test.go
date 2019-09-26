@@ -117,7 +117,8 @@ func TestParseOK(t *testing.T) {
 	for _, tc := range testcase {
 		actual, err := Parse(tc.input)
 		if err != nil {
-			t.Errorf("input: '%s', pase error: %s", tc.input, err.Error())
+			t.Errorf("input: '%s', error: %s", tc.input, err.Error())
+			continue
 		}
 		if !equal(t, actual, &tc.expected) {
 			t.Errorf("input: '%s', expected: %v, actual: %v", tc.input, tc.expected, *actual)
