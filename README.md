@@ -1,19 +1,25 @@
 # semver
 
-`semver` is a command-line tool and a Go library for parsing "[Semantic Versioning 2.0.0][semver-v2]".
+`semver` は "[Semantic Versioning 2.0.0][semver-v2]" をパースするコマンドラインツールです。
 
-## Installation
+"Semantic Versioning 2.0.0" をコマンドラインで処理するツールがなかったので作成しました。
+CircleCI を使った GitHub プロジェクトの自動リリース等で、 バージョン番号のバリデーションに使用できます。
+
+## インストール
+
+`semver` のインストールには Go が必要です。以下のように `go get` を実行してください。
 
 ```console
 $ go get -u github.com/masa213f/semver/cmd/semver
 ```
 
-## Usage
+## 使用方法
+
+`semver` の引数に、パースしたいバージョン番号(文字列)を指定してください。
+パースが成功すると、以下のように json 形式で結果が出力されます。
+(以下は jq コマンドを使用して出力を整形した例です。)
 
 ```console
-# Parse a version.
-# If the parsing is success, `semver` returns exit status "0".
-
 $ semver v1.1.2-rc.0+build | jq .
 {
   "major": 1,
@@ -33,50 +39,12 @@ $ semver v1.1.2-rc.0+build | jq .
 }
 ```
 
-```console
-# Check if a version is pre-release.
-# If the version is pre-release, `semver` returns exit status "0".
+バージョン番号のパースが成功すると、コマンドの終了ステータスとして `0` が返され、パースが失敗すると `1` を返します。
 
-$ semver -p v1.1.2-rc.0+build | jq .
-{
-  "major": 1,
-  "minor": 1,
-  "patch": 2,
-  "prerelease": [
-    {
-      "string": "rc"
-    },
-    {
-      "number": 0
-    }
-  ],
-  "build": [
-    "build"
-  ]
-}
-```
+また、プレリリースバージョンの判定には、`-p` オプションを指定します。
 
 ```console
-# Check if a version has build meta data.
-# If the version build meta data, `semver` returns exit status "0".
-
-$ semver -p v1.1.2-rc.0+build | jq .
-{
-  "major": 1,
-  "minor": 1,
-  "patch": 2,
-  "prerelease": [
-    {
-      "string": "rc"
-    },
-    {
-      "number": 0
-    }
-  ],
-  "build": [
-    "build"
-  ]
-}
+$ semver -p v1.1.2-rc.0+build
 ```
 
 [semver-v2]: https://semver.org/
