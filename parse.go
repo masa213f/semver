@@ -2,14 +2,14 @@ package semver
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 const (
-	digitRegexp        = "0|[1-9][0-9]{0,15}"
+	digitRegexp        = "[0-9]{1,16}"
 	alnumRegexp        = "[0-9A-Za-z-]{1,16}"
 	prefixRegexp       = "[^0-9]{0,16}"
 	versionCoreRegexp  = "(" + digitRegexp + ")\\.(" + digitRegexp + ")\\.(" + digitRegexp + ")"
@@ -92,29 +92,56 @@ func parseUint(str string) uint64 {
 	return num
 }
 
-func isValidNumber(str string) bool {
-	return validNumeric.MatchString(str)
+const (
+	stringIdentifier = iota
+	numberIdentifier
+	invalidIdentifier
+)
+
+func identifierType(str string) int {
+	if !validNumeric.MatchString(str) {
+		// string (alphanumeric identifier)
+		return stringIdentifier
+	} else if str == "0" || str[0] != '0' {
+		// number (numeric identifier)
+		return numberIdentifier
+	}
+	// invalid string: Numeric identifiers MUST NOT include leading zeroes.
+	return invalidIdentifier
 }
 
-func parsePreRelease(str string) []PreReleaseID {
+func parseCoreVersion(part, str string) (uint64, error) {
+	switch identifierType(str) {
+	case numberIdentifier:
+		return parseUint(str), nil
+	case invalidIdentifier:
+		return 0, newInvalidNumericError(part, str)
+	}
+	return 0, errors.New("unexpected error")
+}
+
+func parsePreRelease(str string) ([]PreReleaseID, error) {
 	if str == "" {
-		return make([]PreReleaseID, 0)
+		return nil, nil
 	}
 	tmp := strings.Split(str, ".")
 	ids := make([]PreReleaseID, len(tmp))
 	for i, str := range tmp {
-		if isValidNumber(str) {
-			ids[i].Number = parseUint(str)
-		} else {
+		switch identifierType(str) {
+		case stringIdentifier:
 			ids[i].String = str
+		case numberIdentifier:
+			ids[i].Number = parseUint(str)
+		case invalidIdentifier:
+			return nil, newInvalidNumericError("pre-release["+strconv.Itoa(i)+"]", str)
 		}
 	}
-	return ids
+	return ids, nil
 }
 
 func parseBuild(str string) []BuildID {
 	if str == "" {
-		return make([]BuildID, 0)
+		return nil
 	}
 	tmp := strings.Split(str, ".")
 	ids := make([]BuildID, len(tmp))
@@ -127,11 +154,11 @@ func parseBuild(str string) []BuildID {
 // Parse is xxx.
 func Parse(str string) (*Version, error) {
 	if len(str) > maxInputLength {
-		return nil, fmt.Errorf("max length")
+		return nil, newParseError("too long input")
 	}
 	submatch := validVersion.FindStringSubmatch(str)
 	if len(submatch) == 0 {
-		return nil, fmt.Errorf("parse error")
+		return nil, newParseError("format error")
 	}
 	// for i, v := range submatch {
 	// 	fmt.Println(">", i, v)
@@ -139,10 +166,31 @@ func Parse(str string) (*Version, error) {
 	ver := &Version{}
 	ver.Prefix = submatch[1]
 	ver.Version = submatch[2]
-	ver.Major = parseUint(submatch[3])
-	ver.Minor = parseUint(submatch[4])
-	ver.Patch = parseUint(submatch[5])
-	ver.PreRelease = parsePreRelease(submatch[7])
+
+	major, err := parseCoreVersion("major", submatch[3])
+	if err != nil {
+		return nil, newParseError(err.Error())
+	}
+	ver.Major = major
+
+	minor, err := parseCoreVersion("minor", submatch[4])
+	if err != nil {
+		return nil, newParseError(err.Error())
+	}
+	ver.Minor = minor
+
+	patch, err := parseCoreVersion("patch", submatch[5])
+	if err != nil {
+		return nil, newParseError(err.Error())
+	}
+	ver.Patch = patch
+
+	pre, err := parsePreRelease(submatch[7])
+	if err != nil {
+		return nil, newParseError(err.Error())
+	}
+	ver.PreRelease = pre
+
 	ver.Build = parseBuild(submatch[10])
 	return ver, nil
 }

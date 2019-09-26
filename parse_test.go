@@ -44,7 +44,7 @@ func equal(t *testing.T, o1, o2 *Version) bool {
 	return true
 }
 
-func TestParseOK(t *testing.T) {
+func TestParseSuccess(t *testing.T) {
 	testcase := []struct {
 		input    string
 		expected Version
@@ -90,19 +90,19 @@ func TestParseOK(t *testing.T) {
 			},
 		},
 		{
-			input: "0.0.0-00.01.10.11.aaa.bbb",
-			expected: Version{
-				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{String: "00"}, {String: "01"}, {Number: 10}, {Number: 11}, {String: "aaa"}, {String: "bbb"}},
-				Build:      []BuildID{},
-			},
-		},
-		{
 			input: "0.0.0+0",
 			expected: Version{
 				Major: 0, Minor: 0, Patch: 0,
 				PreRelease: []PreReleaseID{},
 				Build:      []BuildID{"0"},
+			},
+		},
+		{
+			input: "0.0.0+00.01.10.11.aaa.bbb",
+			expected: Version{
+				Major: 0, Minor: 0, Patch: 0,
+				PreRelease: []PreReleaseID{},
+				Build:      []BuildID{"00", "01", "10", "11", "aaa", "bbb"},
 			},
 		},
 		{
@@ -117,11 +117,31 @@ func TestParseOK(t *testing.T) {
 	for _, tc := range testcase {
 		actual, err := Parse(tc.input)
 		if err != nil {
-			t.Errorf("input: '%s', error: %s", tc.input, err.Error())
+			t.Errorf("FAIL: input='%s', error='%s'", tc.input, err.Error())
 			continue
 		}
 		if !equal(t, actual, &tc.expected) {
-			t.Errorf("input: '%s', expected: %v, actual: %v", tc.input, tc.expected, *actual)
+			t.Errorf("FAIL: input='%s', expected=%v, actual=%v", tc.input, tc.expected, *actual)
+			continue
 		}
+		t.Logf("PASS: input='%s', result=%v", tc.input, *actual)
+	}
+}
+
+func TestParseFailure(t *testing.T) {
+	testcase := []string{
+		"01.0.0",
+		"0.01.0",
+		"0.0.01",
+		"12345.67890.12345-rc.00",
+		"12345.67890.12345-rc.12345.00+build.0000",
+	}
+	for _, tc := range testcase {
+		actual, err := Parse(tc)
+		if err != nil {
+			t.Logf("PASS: input='%s', error='%s'", tc, err.Error())
+			continue
+		}
+		t.Errorf("FAIL: input='%s', result=%v", tc, *actual)
 	}
 }
