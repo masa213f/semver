@@ -74,6 +74,14 @@ func (pr *PreReleaseID) IsNumber() bool {
 	return false
 }
 
+// ToString is xxx.
+func (pr *PreReleaseID) ToString() string {
+	if pr.IsNumber() {
+		return strconv.FormatUint(pr.Number, 10)
+	}
+	return pr.String
+}
+
 // MarshalJSON is xxx.
 func (pr PreReleaseID) MarshalJSON() ([]byte, error) {
 	if pr.IsNumber() {

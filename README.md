@@ -16,22 +16,33 @@ $ go get -u github.com/masa213f/semver/cmd/semver
 ## 使用方法
 
 `semver` の引数に、パースしたいバージョン番号(文字列)を指定してください。
-パースが成功すると、以下のように json 形式で結果が出力されます。
+パースが成功すると、以下のように結果が出力されます。
+
+```console
+$ semver v1.1.2-rc.0+build
+prefix: v
+version: 1.1.2-rc.0+build
+major: 1
+minor: 1
+patch: 2
+prerelease: rc.0
+build: build
+```
+
+また、`-json`オプションを指定すると、結果が JSON で出力されます。
 (以下は jq コマンドを使用して出力を整形した例です。)
 
 ```console
-$ semver v1.1.2-rc.0+build | jq .
+semver -json v1.1.2-rc.0+build | jq .
 {
+  "prefix": "v",
+  "version": "1.1.2-rc.0+build",
   "major": 1,
   "minor": 1,
   "patch": 2,
   "prerelease": [
-    {
-      "string": "rc"
-    },
-    {
-      "number": 0
-    }
+    "rc",
+    "0"
   ],
   "build": [
     "build"

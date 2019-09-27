@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +12,7 @@ import (
 const (
 	exitStatusSuccess          = 0
 	exitStatusParseFailure     = 1
-	exitStagusConditionFailure = 2
+	exitStatusConditionFailure = 2
 	exitStatusInvalidOption    = 3
 	exitStatusInternalError    = 4
 )
@@ -37,45 +36,62 @@ Copyright 2019 xxx.
 	fmt.Fprintf(o, usage)
 }
 
-func show(o io.Writer, ver *semver.Version) {
-	bytes, _ := json.Marshal(ver)
-	fmt.Println(string(bytes))
-}
-
 func main() {
-	opt, err := parseOptions(os.Args[1:])
+	cmdOpt, err := parseOptions(os.Args[1:])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		os.Exit(exitStatusInvalidOption)
 	}
 
-	if opt.showVersion {
+	if cmdOpt.showVersion {
 		showVersion(os.Stdout)
 		os.Exit(exitStatusSuccess)
 	}
 
-	if opt.showUsage {
+	if cmdOpt.showUsage {
 		showUsage(os.Stdout)
 		os.Exit(exitStatusSuccess)
 	}
 
-	target := strings.TrimSpace(opt.target)
-	ver, err := semver.Parse(strings.TrimSpace(opt.target))
+	target := strings.TrimSpace(cmdOpt.target)
+	ver, err := semver.Parse(strings.TrimSpace(cmdOpt.target))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(exitStatusParseFailure)
 	}
 
-	if opt.isConditionCheck() {
-		if opt.isPreRelease && !ver.IsPreRelease() {
-			fmt.Fprintf(os.Stderr, "%s is not pre-release\n", target)
-			os.Exit(exitStagusConditionFailure)
+	if !cmdOpt.isConditionCheck() {
+		// output all fields
+		if cmdOpt.jsonOutput {
+			outputJSON(os.Stdout, ver, nil)
+		} else {
+			outputText(os.Stdout, ver, nil)
 		}
-		if opt.hasBuildMeta && !ver.HasBuildMeta() {
-			fmt.Fprintf(os.Stderr, "%s does not have build metadata\n", target)
-			os.Exit(exitStagusConditionFailure)
-		}
+		os.Exit(exitStatusSuccess)
 	}
-	show(os.Stdout, ver)
+
+	outOpt := newOutputOption()
+
+	if cmdOpt.isPreRelease {
+		if !ver.IsPreRelease() {
+			fmt.Fprintf(os.Stderr, "%s is not pre-release version\n", target)
+			os.Exit(exitStatusConditionFailure)
+		}
+		outOpt.displayPreRelease = true
+	}
+	if cmdOpt.hasBuildMeta {
+		if !ver.HasBuildMeta() {
+			fmt.Fprintf(os.Stderr, "%s does not have build metadata\n", target)
+			os.Exit(exitStatusConditionFailure)
+		}
+		outOpt.displayBuildMeta = true
+	}
+
+	// output selected fields
+	if cmdOpt.jsonOutput {
+		outputJSON(os.Stdout, ver, outOpt)
+	} else {
+		outputText(os.Stdout, ver, outOpt)
+	}
 	os.Exit(exitStatusSuccess)
 }
