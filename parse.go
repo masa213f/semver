@@ -141,7 +141,7 @@ func parsePreRelease(str string) ([]PreReleaseID, error) {
 		case numberIdentifier:
 			ids[i].Number = parseUint(str)
 		case invalidIdentifier:
-			return nil, newInvalidNumericError("pre-release["+strconv.Itoa(i)+"]", str)
+			return nil, newInvalidNumericError("prerelease["+strconv.Itoa(i)+"]", str)
 		}
 	}
 	return ids, nil

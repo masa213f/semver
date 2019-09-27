@@ -63,7 +63,7 @@ func newOutputVersion(ver *semver.Version, opt *outputOption) *outputVersion {
 
 func outputJSON(o io.Writer, ver *semver.Version, opt *outputOption) {
 	out := newOutputVersion(ver, opt)
-	bytes, _ := json.Marshal(out)
+	bytes, _ := json.MarshalIndent(out, "", "  ")
 	fmt.Fprintln(o, string(bytes))
 }
 

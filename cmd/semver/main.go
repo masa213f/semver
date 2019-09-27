@@ -26,13 +26,6 @@ func showVersion(o io.Writer) {
 }
 
 func showUsage(o io.Writer) {
-	const usage = `
-Usage: semver
-
-T.B.D.
-
-Copyright 2019 xxx.
-`
 	fmt.Fprintf(o, usage)
 }
 

@@ -8,7 +8,7 @@ type invalidNumericError struct {
 }
 
 func (e *invalidNumericError) Error() string {
-	return fmt.Sprintf("%s is invalid numeric identifier (leading zeros): %s", e.part, e.value)
+	return fmt.Sprintf("invalid numeric identifier (leading zeros): %s = %s", e.part, e.value)
 }
 
 func newInvalidNumericError(part, value string) *invalidNumericError {

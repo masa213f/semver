@@ -14,7 +14,19 @@ $(TARGET): $(SOURCE)
 	go build -o $(TARGET) -ldflags "-X main.version=$(VERSION)" ./cmd/$(TARGET)/...
 
 run: build
-	-./$(TARGET) "v0.0.0-rc.0+20190925"
+	# Run the example commands in README.md.
+	@echo
+	./$(TARGET) v1.2.3-rc.0+build.20190925        ; echo "# => exit status: $$?"
+	@echo
+	./$(TARGET) v1.2.3-rc.0+build.20190925 --json ; echo "# => exit status: $$?"
+	@echo
+	./semver v1.12                                ; echo "# => exit status: $$?"
+	@echo
+	./semver v1.01.0                              ; echo "# => exit status: $$?"
+	@echo
+	./semver -p v1.1.2-rc.0                       ; echo "# => exit status: $$?"
+	@echo
+	./semver -p v1.1.2                            ; echo "# => exit status: $$?"
 
 clean:
 	-rm $(TARGET)
