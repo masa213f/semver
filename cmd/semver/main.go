@@ -46,7 +46,6 @@ func main() {
 		os.Exit(exitStatusSuccess)
 	}
 
-	target := strings.TrimSpace(cmdOpt.target)
 	ver, err := semver.Parse(strings.TrimSpace(cmdOpt.target))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -67,14 +66,14 @@ func main() {
 
 	if cmdOpt.isPreRelease {
 		if !ver.IsPreRelease() {
-			fmt.Fprintf(os.Stderr, "%s is not pre-release version\n", target)
+			fmt.Fprintf(os.Stderr, "official version: version = %s\n", ver.Version)
 			os.Exit(exitStatusConditionFailure)
 		}
 		outOpt.displayPreRelease = true
 	}
 	if cmdOpt.hasBuildMeta {
 		if !ver.HasBuildMeta() {
-			fmt.Fprintf(os.Stderr, "%s does not have build metadata\n", target)
+			fmt.Fprintf(os.Stderr, "no build metadata: version = %s\n", ver.Version)
 			os.Exit(exitStatusConditionFailure)
 		}
 		outOpt.displayBuildMeta = true

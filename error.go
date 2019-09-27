@@ -18,7 +18,7 @@ func newInvalidNumericError(part, value string) *invalidNumericError {
 	}
 }
 
-// ParseError is xxx.
+// ParseError represents an error caused during parsing.
 type ParseError struct {
 	message string
 }

@@ -74,7 +74,7 @@ prerelease: rc.0
 # => exit status: 0
 
 $ semver -p v1.1.2
-v1.1.2 is not pre-release version
+official version: version = 1.1.2
 # => exit status: 2
 ```
 
