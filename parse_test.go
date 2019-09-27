@@ -1,147 +1,234 @@
 package semver
 
 import (
+	"reflect"
 	"testing"
 )
 
-func equal(t *testing.T, o1, o2 *Version) bool {
+func cmpValue(o1, o2 *Version) bool {
+	if o1 == nil && o2 == nil {
+		return true
+	}
+
+	if o1.Prefix != o2.Prefix {
+		return false
+	}
+	if o1.Version != o2.Version {
+		return false
+	}
 	if o1.Major != o2.Major {
-		t.Log("Major", o1.Major, o2.Major)
 		return false
 	}
 	if o1.Minor != o2.Minor {
-		t.Log("Minor", o1.Minor, o2.Minor)
 		return false
 	}
 	if o1.Patch != o2.Patch {
-		t.Log("Patch", o1.Patch, o2.Patch)
 		return false
 	}
 	if len(o1.PreRelease) != len(o2.PreRelease) {
-		t.Log("len(pre)", len(o1.PreRelease), len(o2.PreRelease))
 		return false
 	}
 	for i := range o1.PreRelease {
 		if o1.PreRelease[i].String != o2.PreRelease[i].String {
-			t.Log("pre.String", i, o1.PreRelease[i].String, o2.PreRelease[i].String)
 			return false
 		}
 		if o1.PreRelease[i].Number != o2.PreRelease[i].Number {
-			t.Log("pre.Number", i, o1.PreRelease[i].Number, o2.PreRelease[i].Number)
 			return false
 		}
 	}
 	if len(o1.Build) != len(o2.Build) {
-		t.Log("len(build)", len(o1.Build), len(o2.Build))
 		return false
 	}
 	for i := range o1.Build {
 		if o1.Build[i] != o2.Build[i] {
-			t.Log("build", i, o1.Build[i], o2.Build[i])
 			return false
 		}
 	}
 	return true
 }
 
-func TestParseSuccess(t *testing.T) {
+func cmpError(e1, e2 error) bool {
+	if e1 == nil && e2 == nil {
+		return true
+	}
+
+	t1 := reflect.TypeOf(e1)
+	t2 := reflect.TypeOf(e2)
+
+	if t1 == t2 {
+		return true
+	}
+	return false
+}
+
+func TestParse(t *testing.T) {
 	testcase := []struct {
-		input    string
-		expected Version
+		input         string
+		expectedValue *Version
+		expectedError error
 	}{
 		{
 			input: "0.0.0",
-			expected: Version{
-				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{},
-				Build:      []BuildID{},
-			},
-		},
-		{
-			input: "1111.2222.3333",
-			expected: Version{
-				Major: 1111, Minor: 2222, Patch: 3333,
-				PreRelease: []PreReleaseID{},
-				Build:      []BuildID{},
-			},
-		},
-		{
-			input: "999999999999.999999999999.999999999999",
-			expected: Version{
-				Major: 999999999999, Minor: 999999999999, Patch: 999999999999,
-				PreRelease: []PreReleaseID{},
-				Build:      []BuildID{},
+			expectedValue: &Version{
+				Version: "0.0.0",
+				Major:   0, Minor: 0, Patch: 0,
 			},
 		},
 		{
 			input: "0.0.0-0",
-			expected: Version{
-				Major: 0, Minor: 0, Patch: 0,
+			expectedValue: &Version{
+				Version: "0.0.0-0",
+				Major:   0, Minor: 0, Patch: 0,
 				PreRelease: []PreReleaseID{{Number: 0}},
-				Build:      []BuildID{},
 			},
 		},
 		{
-			input: "0.0.0-rc.1",
-			expected: Version{
-				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{String: "rc"}, {Number: 1}},
-				Build:      []BuildID{},
+			input: "0.0.0--",
+			expectedValue: &Version{
+				Version: "0.0.0--",
+				Major:   0, Minor: 0, Patch: 0,
+				PreRelease: []PreReleaseID{{String: "-"}},
 			},
 		},
 		{
 			input: "0.0.0+0",
-			expected: Version{
-				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{},
+			expectedValue: &Version{
+				Version: "0.0.0+0",
+				Major:   0, Minor: 0, Patch: 0,
+				Build: []BuildID{"0"},
+			},
+		},
+		{
+			input: "0.0.0+0-0",
+			expectedValue: &Version{
+				Version: "0.0.0+0-0",
+				Major:   0, Minor: 0, Patch: 0,
+				Build: []BuildID{"0-0"},
+			},
+		},
+		{
+			input: "0.0.0-0+0",
+			expectedValue: &Version{
+				Version: "0.0.0-0+0",
+				Major:   0, Minor: 0, Patch: 0,
+				PreRelease: []PreReleaseID{{Number: 0}},
 				Build:      []BuildID{"0"},
 			},
 		},
 		{
-			input: "0.0.0+00.01.10.11.aaa.bbb",
-			expected: Version{
-				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{},
-				Build:      []BuildID{"00", "01", "10", "11", "aaa", "bbb"},
+			input: "ver123.456.789-1234.5678.90ab.ceef+1234.5678.90ab.ceef",
+			expectedValue: &Version{
+				Prefix: "ver", Version: "123.456.789-1234.5678.90ab.ceef+1234.5678.90ab.ceef",
+				Major: 123, Minor: 456, Patch: 789,
+				PreRelease: []PreReleaseID{{Number: 1234}, {Number: 5678}, {String: "90ab"}, {String: "ceef"}},
+				Build:      []BuildID{"1234", "5678", "90ab", "ceef"},
 			},
 		},
 		{
-			input: "123.456.789-123.456.789.0ab.cde+123.456.789.0ab.cde",
-			expected: Version{
-				Major: 123, Minor: 456, Patch: 789,
-				PreRelease: []PreReleaseID{{Number: 123}, {Number: 456}, {Number: 789}, {String: "0ab"}, {String: "cde"}},
-				Build:      []BuildID{"123", "456", "789", "0ab", "cde"},
+			input: "v1.2.15-rc.1+build20190907",
+			expectedValue: &Version{
+				Prefix: "v", Version: "1.2.15-rc.1+build20190907",
+				Major: 1, Minor: 2, Patch: 15,
+				PreRelease: []PreReleaseID{{String: "rc"}, {Number: 1}},
+				Build:      []BuildID{"build20190907"},
 			},
+		},
+		{
+			input: "pppppppppppppppp9999999999999999.9999999999999999.9999999999999999-1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc+1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc",
+			expectedValue: &Version{
+				Prefix:  "pppppppppppppppp",
+				Version: "9999999999999999.9999999999999999.9999999999999999-1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc+1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc",
+				Major:   9999999999999999, Minor: 9999999999999999, Patch: 9999999999999999,
+				PreRelease: []PreReleaseID{
+					{Number: 1111111111111111}, {Number: 2222222222222222}, {Number: 3333333333333333}, {String: "aaaaaaaaaaaaaaaa"}, {String: "bbbbbbbbbbbbbbbb"}, {String: "cccccccccccccccc"},
+				},
+				Build: []BuildID{
+					"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc",
+				},
+			},
+		},
+
+		// invalid case
+		{
+			input:         "",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.0+",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.0-",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "12345678901234567.0.0",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.12345678901234567.0",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.12345678901234567",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.0-12345678901234567",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.0-1.2.3.4.5.6.7",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.0+12345678901234567",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.0+1.2.3.4.5.6.7",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "01.0.0",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.01.0",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "0.0.01",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "12345.67890.12345-rc.00",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "12345.67890.12345-rc.12345.00+build.0000",
+			expectedError: newParseError(""),
+		},
+		{
+			input:         "xpppppppppppppppp9999999999999999.9999999999999999.9999999999999999-1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc+1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc",
+			expectedError: newParseError(""),
 		},
 	}
 	for _, tc := range testcase {
-		actual, err := Parse(tc.input)
-		if err != nil {
-			t.Errorf("FAIL: input='%s', error='%s'", tc.input, err.Error())
-			continue
-		}
-		if !equal(t, actual, &tc.expected) {
-			t.Errorf("FAIL: input='%s', expected=%v, actual=%v", tc.input, tc.expected, *actual)
-			continue
-		}
-		t.Logf("PASS: input='%s', result=%v", tc.input, *actual)
-	}
-}
-
-func TestParseFailure(t *testing.T) {
-	testcase := []string{
-		"01.0.0",
-		"0.01.0",
-		"0.0.01",
-		"12345.67890.12345-rc.00",
-		"12345.67890.12345-rc.12345.00+build.0000",
-	}
-	for _, tc := range testcase {
-		actual, err := Parse(tc)
-		if err != nil {
-			t.Logf("PASS: input='%s', error='%s'", tc, err.Error())
-			continue
-		}
-		t.Errorf("FAIL: input='%s', result=%v", tc, *actual)
+		t.Run(tc.input, func(t *testing.T) {
+			actualValue, actualError := Parse(tc.input)
+			if !cmpValue(actualValue, tc.expectedValue) {
+				t.Errorf("expected=%v, actual=%v", *tc.expectedValue, *actualValue)
+				return
+			}
+			if !cmpError(actualError, tc.expectedError) {
+				t.Errorf("error='%v'", actualError)
+				return
+			}
+		})
 	}
 }
