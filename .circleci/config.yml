@@ -33,9 +33,9 @@ jobs:
     - run:
         name: Set git configs
         command: |
-          # memo: GIT_CONFIG_USER_NAME and GIT_CONFIG_USER_MAIL must be set by "Environment Variables".
+          # memo: GIT_CONFIG_USER_NAME and GIT_CONFIG_USER_EMAIL must be set by "Environment Variables".
           git config --global user.name "${GIT_CONFIG_USER_NAME}"
-          git config --global user.email "${GIT_CONFIG_USER_MAIL}"
+          git config --global user.email "${GIT_CONFIG_USER_EMAIL}"
     - run:
         name: Update program version and commit
         command: |
@@ -67,9 +67,9 @@ jobs:
     - run:
         name: Set git configs
         command: |
-          # memo: GIT_CONFIG_USER_NAME and GIT_CONFIG_USER_MAIL must be set by "Environment Variables".
+          # memo: GIT_CONFIG_USER_NAME and GIT_CONFIG_USER_EMAIL must be set by "Environment Variables".
           git config --global user.name "${GIT_CONFIG_USER_NAME}"
-          git config --global user.email "${GIT_CONFIG_USER_MAIL}"
+          git config --global user.email "${GIT_CONFIG_USER_EMAIL}"
     - run:
         name: Add release tag
         command: |
