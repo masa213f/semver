@@ -19,7 +19,7 @@ jobs:
     - checkout
     - add_ssh_keys:
         fingerprints:
-          - "2a:b2:db:68:e4:f4:3e:76:db:c7:a9:77:33:a0:ec:02"
+          - "80:1b:4c:08:a8:82:17:dc:fc:f5:e4:6a:c8:60:67:f4"
     - run:
         name: Install commands
         command: |
@@ -63,7 +63,7 @@ jobs:
     - checkout
     - add_ssh_keys:
         fingerprints:
-          - "2a:b2:db:68:e4:f4:3e:76:db:c7:a9:77:33:a0:ec:02"
+          - "80:1b:4c:08:a8:82:17:dc:fc:f5:e4:6a:c8:60:67:f4"
     - run:
         name: Set git configs
         command: |
@@ -84,7 +84,7 @@ jobs:
     - checkout
     - add_ssh_keys:
         fingerprints:
-          - "2a:b2:db:68:e4:f4:3e:76:db:c7:a9:77:33:a0:ec:02"
+          - "80:1b:4c:08:a8:82:17:dc:fc:f5:e4:6a:c8:60:67:f4"
     - run:
         name: Install semver
         command: |
