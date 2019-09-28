@@ -23,16 +23,11 @@ jobs:
     - run:
         name: Install commands
         command: |
-          # semver
           go get -u github.com/masa213f/semver/cmd/semver
-          # hub
-          curl -sSLf https://github.com/github/hub/releases/download/v2.12.7/hub-linux-amd64-2.8.3.tgz | \
-          tar zxf - --strip-components=1 -C /tmp/ && \
-          mv /tmp/bin/hub /usr/local/bin/hub
     - run:
         name: Confirm the release version
         command: |
-          RELEASE_VERSION=$(semver ${CIRCLE_TAG} --json | jq -r ".version")
+          RELEASE_VERSION=$(semver ${CIRCLE_BRANCH} --json | jq -r ".version")
           echo "export RELEASE_VERSION=${RELEASE_VERSION}" >> ${BASH_ENV}
           echo "Version: ${RELEASE_VERSION}"
     - run:
@@ -47,11 +42,17 @@ jobs:
           echo ${RELEASE_VERSION} > version.txt
           git add version.txt
           git commit -m "Bump version to ${RELEASE_VERSION}"
-          git push
+          git push --set-upstream origin ${CIRCLE_BRANCH}
+    - run:
+        name: Install hub
+        command: |
+          HUB_VERSION=2.12.7
+          curl -sSLf -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+          tar zxf hub-linux-amd64-${HUB_VERSION}.tgz --strip-components=1 -C /tmp/
     - run:
         name: Create a pull request
         command: |
-          hub pull-request --message="Bump version to ${RELEASE_VERSION}" --base=${CIRCLE_PROJECT_USERNAME}:master --head=${CIRCLE_PROJECT_USERNAME}:${CIRCLE_BRANCH}
+          /tmp/bin/hub pull-request --message="Bump version to ${RELEASE_VERSION}" --base=${CIRCLE_PROJECT_USERNAME}:master --head=${CIRCLE_PROJECT_USERNAME}:${CIRCLE_BRANCH}
 
   add_release_tag:
     docker:
@@ -85,12 +86,9 @@ jobs:
         fingerprints:
           - "2a:b2:db:68:e4:f4:3e:76:db:c7:a9:77:33:a0:ec:02"
     - run:
-        name: Install commands
+        name: Install semver
         command: |
-          # hub
-          curl -sSLf https://github.com/github/hub/releases/download/v2.12.7/hub-linux-amd64-2.8.3.tgz | \
-          tar zxf - --strip-components=1 -C /tmp/ && \
-          mv /tmp/bin/hub /usr/local/bin/hub
+          go get -u github.com/masa213f/semver/cmd/semver
     - run:
         name: Build and output the program version
         command: |
@@ -98,13 +96,19 @@ jobs:
           ./semver --version
           mv semver /tmp/release/semver-linux-amd64-v${RELEASE_VERSION}
     - run:
+        name: Install hub
+        command: |
+          HUB_VERSION=2.12.7
+          curl -sSLf -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+          tar zxf hub-linux-amd64-${HUB_VERSION}.tgz --strip-components=1 -C /tmp/
+    - run:
         name: Release as draft
         command: |
           set -x
           if semver -p "${RELEASE_VERSION}"; then
              PRE_OPT=-p
           fi
-          hub release create -d ${PRE_OPT} -m v${RELEASE_VERSION} ${CIRCLE_TAG} -a ./semver-linux-amd64-v${RELEASE_VERSION}
+          /tmp/bin/hub release create -d ${PRE_OPT} -m v${RELEASE_VERSION} v${RELEASE_VERSION} -a ./semver-linux-amd64-v${RELEASE_VERSION}
 
 workflows:
   version: 2
@@ -121,13 +125,13 @@ workflows:
     - run_test:
         filters:
           branches:
-            only: /.release-v.*/
+            only: /^release-v.*/
     - create_release_pr:
         requires:
           - run_test
         filters:
           branches:
-            only: /.release-v.*/
+            only: /^release-v.*/
   master:
     jobs:
     - add_release_tag:
