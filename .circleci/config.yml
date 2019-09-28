@@ -23,7 +23,12 @@ jobs:
     - run:
         name: Install commands
         command: |
+          # semver
           go get -u github.com/masa213f/semver/cmd/semver
+          # hub
+          HUB_VERSION=2.12.7
+          curl -sSLf -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+          tar zxf hub-linux-amd64-${HUB_VERSION}.tgz --strip-components=1 -C /tmp/
     - run:
         name: Confirm the release version
         command: |
@@ -43,12 +48,6 @@ jobs:
           git add version.txt
           git commit -m "[ci skip] Bump version to ${RELEASE_VERSION}"
           git push --set-upstream origin ${CIRCLE_BRANCH}
-    - run:
-        name: Install hub
-        command: |
-          HUB_VERSION=2.12.7
-          curl -sSLf -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-          tar zxf hub-linux-amd64-${HUB_VERSION}.tgz --strip-components=1 -C /tmp/
     - run:
         name: Create a pull request
         command: |
@@ -73,7 +72,10 @@ jobs:
     - run:
         name: Add release tag
         command: |
-          git tag $(cat version.txt)
+          RELEASE_TAG=v$(cat version.txt)
+          echo "Tag: ${RELEASE_TAG}"
+          git tag ${RELEASE_TAG}
+          git push --set-upstream origin ${RELEASE_TAG}
 
   release_in_github:
     docker:
@@ -86,25 +88,26 @@ jobs:
         fingerprints:
           - "80:1b:4c:08:a8:82:17:dc:fc:f5:e4:6a:c8:60:67:f4"
     - run:
-        name: Install semver
+        name: Install commands
         command: |
+          # semver
           go get -u github.com/masa213f/semver/cmd/semver
-    - run:
-        name: Build and output the program version
-        command: |
-          make build
-          ./semver --version
-          mv semver /tmp/release/semver-linux-amd64-v${RELEASE_VERSION}
-    - run:
-        name: Install hub
-        command: |
+          # hub
           HUB_VERSION=2.12.7
           curl -sSLf -O https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
           tar zxf hub-linux-amd64-${HUB_VERSION}.tgz --strip-components=1 -C /tmp/
     - run:
+        name: Build and output the program version
+        command: |
+          RELEASE_VERSION=$(cat version.txt)
+          make build
+          ./semver --version
+          mv semver semver-linux-amd64-v${RELEASE_VERSION}
+    - run:
         name: Release as draft
         command: |
           set -x
+          RELEASE_VERSION=$(cat version.txt)
           if semver -p "${RELEASE_VERSION}"; then
              PRE_OPT=-p
           fi
@@ -119,8 +122,8 @@ workflows:
         filters:
           branches:
             only:
-              - develop
-              - /^feature/.*/
+            - develop
+            - /^feature/.*/
   release:
     jobs:
     - run_test:
@@ -128,8 +131,6 @@ workflows:
           branches:
             only: /^release-v.*/
     - create_release_pr:
-        requires:
-          - run_test
         filters:
           branches:
             only: /^release-v.*/
@@ -140,6 +141,8 @@ workflows:
           branches:
             only: master
     - release_in_github:
+        requires:
+        - add_release_tag
         filters:
           branches:
             only: master
