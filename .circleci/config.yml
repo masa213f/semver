@@ -41,7 +41,7 @@ jobs:
         command: |
           echo ${RELEASE_VERSION} > version.txt
           git add version.txt
-          git commit -m "Bump version to ${RELEASE_VERSION}"
+          git commit -m "[ci skip] Bump version to ${RELEASE_VERSION}"
           git push --set-upstream origin ${CIRCLE_BRANCH}
     - run:
         name: Install hub
