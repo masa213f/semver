@@ -33,7 +33,7 @@ jobs:
     - run:
         name: Set git configs
         command: |
-          # memo: GTT_CONFIG_USER_NAME and GIT_CONFIG_USER_MAIL must be set by bash env.
+          # memo: GTT_CONFIG_USER_NAME and GIT_CONFIG_USER_MAIL must be set by "Environment Variables".
           git config --global user.name "${GTT_CONFIG_USER_NAME}"
           git config --global user.email "${GIT_CONFIG_USER_MAIL}"
     - run:
@@ -67,7 +67,7 @@ jobs:
     - run:
         name: Set git configs
         command: |
-          # memo: GTT_CONFIG_USER_NAME and GIT_CONFIG_USER_MAIL must be set by bash env.
+          # memo: GTT_CONFIG_USER_NAME and GIT_CONFIG_USER_MAIL must be set by "Environment Variables".
           git config --global user.name "${GTT_CONFIG_USER_NAME}"
           git config --global user.email "${GIT_CONFIG_USER_MAIL}"
     - run:
@@ -108,6 +108,7 @@ jobs:
           if semver -p "${RELEASE_VERSION}"; then
              PRE_OPT=-p
           fi
+          # memo: GITHUB_TOKEN must be set by "Environment Variables". Create an access token with "public_repo" scope.
           /tmp/bin/hub release create -d ${PRE_OPT} -m v${RELEASE_VERSION} v${RELEASE_VERSION} -a ./semver-linux-amd64-v${RELEASE_VERSION}
 
 workflows:
