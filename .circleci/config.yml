@@ -1,0 +1,74 @@
+version: 2
+jobs:
+  test:
+    docker:
+    - image: circleci/golang:1.12
+      environment:
+        GO111MODULE: "on"
+    steps:
+    - checkout
+    - run: make setup
+    - run: make test
+
+  github_release:
+    docker:
+    - image: circleci/golang:1.12
+      environment:
+        GO111MODULE: "on"
+    steps:
+    - checkout
+    - run:
+        name: setup tools for release
+        command: |
+            go get -u github.com/masa213f/semver/cmd/semver
+            go get -u github.com/tcnksm/ghr
+    - run:
+        name: confirm release version
+        command: |
+          RELEASE_VERSION=$(semver ${CIRCLE_TAG} --json | jq -r ".version")
+          echo "export RELEASE_VERSION=${RELEASE_VERSION}" >> ${BASH_ENV}
+          echo "Version: ${RELEASE_VERSION}"
+    - run:
+        name: build and run
+        command: |
+          make build VERSION=${RELEASE_VERSION}
+          ./semver --version
+    - run:
+        name: archive
+        command: |
+          set -x
+          mkdir /tmp/release
+          git archive --format=tar.gz ${CIRCLE_TAG} > /tmp/release/v${RELEASE_VERSION}.tar.gz
+          git archive --format=zip    ${CIRCLE_TAG} > /tmp/release/v${RELEASE_VERSION}.zip
+          tar czf /tmp/release/semver-linux-amd64-v${RELEASE_VERSION}.tar.gz semver
+    - run:
+        name: release as draft
+        command: |
+          set -x
+          if semver -p "${RELEASE_VERSION}"; then
+             PRE_OPT=-prerelease
+          fi
+          ghr -draft ${PRE_OPT} -n v${RELEASE_VERSION} ${CIRCLE_TAG} /tmp/release
+
+workflows:
+  version: 2
+  main:
+    jobs:
+    - test
+
+  release:
+    jobs:
+    - test:
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v.*/
+    - github_release:
+        requires:
+        - test
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /^v.*/

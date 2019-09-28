@@ -4,6 +4,10 @@ SOURCE = $(shell find . -type f -name "*.go" -not -name "*_test.go")
 
 all: build
 
+setup:
+	go get -u golang.org/x/tools/cmd/goimports
+	go get -u golang.org/x/lint/golint
+
 mod:
 	go mod tidy
 	go mod vendor
@@ -13,7 +17,7 @@ build: mod $(TARGET)
 $(TARGET): $(SOURCE)
 	go build -o $(TARGET) -ldflags "-X main.version=$(VERSION)" ./cmd/$(TARGET)/...
 
-run: build
+run: $(TARGET)
 	# Run the example commands in README.md.
 	@echo
 	./$(TARGET) v1.2.3-rc.0+build.20190925        ; echo "# => exit status: $$?"
@@ -43,4 +47,4 @@ test:
 	test -z "$$(golint $$(go list ./... | grep -v '/vendor/') | tee /dev/stderr)"
 	go test -v ./...
 
-.PHONY: all mod build run clean distclean fmt test
+.PHONY: all setup mod build run clean distclean fmt test
