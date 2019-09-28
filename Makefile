@@ -1,4 +1,4 @@
-VERSION = 0.1.0
+VERSION = $(shell cat version.txt)
 TARGET = semver
 SOURCE = $(shell find . -type f -name "*.go" -not -name "*_test.go")
 
@@ -14,7 +14,7 @@ mod:
 
 build: mod $(TARGET)
 
-$(TARGET): $(SOURCE)
+$(TARGET): $(SOURCE) version.txt
 	go build -o $(TARGET) -ldflags "-X main.version=$(VERSION)" ./cmd/$(TARGET)/...
 
 run: $(TARGET)
