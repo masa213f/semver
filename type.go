@@ -18,7 +18,6 @@ import (
 //   - Build: ["build", "20190928"]
 type Version struct {
 	Prefix     string   `json:"prefix,omitempty"`
-	Version    string   `json:"version"`
 	Major      uint64   `json:"major"`
 	Minor      uint64   `json:"minor"`
 	Patch      uint64   `json:"patch"`

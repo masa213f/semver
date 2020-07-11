@@ -89,7 +89,6 @@ func Parse(str string) (*Version, error) {
 
 	ver := &Version{}
 	ver.Prefix = submatch[1]
-	ver.Version = submatch[2]
 
 	major, err := parseCoreVersion("major", submatch[3])
 	if err != nil {

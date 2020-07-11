@@ -13,9 +13,6 @@ func cmpValue(o1, o2 *Version) bool {
 	if o1.Prefix != o2.Prefix {
 		return false
 	}
-	if o1.Version != o2.Version {
-		return false
-	}
 	if o1.Major != o2.Major {
 		return false
 	}
@@ -67,47 +64,41 @@ func TestParse(t *testing.T) {
 		{
 			input: "0.0.0",
 			expectedValue: &Version{
-				Version: "0.0.0",
-				Major:   0, Minor: 0, Patch: 0,
+				Major: 0, Minor: 0, Patch: 0,
 			},
 		},
 		{
 			input: "0.0.0-0",
 			expectedValue: &Version{
-				Version: "0.0.0-0",
-				Major:   0, Minor: 0, Patch: 0,
+				Major: 0, Minor: 0, Patch: 0,
 				PreRelease: []string{"0"},
 			},
 		},
 		{
 			input: "0.0.0--",
 			expectedValue: &Version{
-				Version: "0.0.0--",
-				Major:   0, Minor: 0, Patch: 0,
+				Major: 0, Minor: 0, Patch: 0,
 				PreRelease: []string{"-"},
 			},
 		},
 		{
 			input: "0.0.0+0",
 			expectedValue: &Version{
-				Version: "0.0.0+0",
-				Major:   0, Minor: 0, Patch: 0,
+				Major: 0, Minor: 0, Patch: 0,
 				Build: []string{"0"},
 			},
 		},
 		{
 			input: "0.0.0+0-0",
 			expectedValue: &Version{
-				Version: "0.0.0+0-0",
-				Major:   0, Minor: 0, Patch: 0,
+				Major: 0, Minor: 0, Patch: 0,
 				Build: []string{"0-0"},
 			},
 		},
 		{
 			input: "0.0.0-0+0",
 			expectedValue: &Version{
-				Version: "0.0.0-0+0",
-				Major:   0, Minor: 0, Patch: 0,
+				Major: 0, Minor: 0, Patch: 0,
 				PreRelease: []string{"0"},
 				Build:      []string{"0"},
 			},
@@ -115,8 +106,8 @@ func TestParse(t *testing.T) {
 		{
 			input: "ver123.456.789-1234.5678.90ab.ceef+1234.5678.90ab.ceef",
 			expectedValue: &Version{
-				Prefix: "ver", Version: "123.456.789-1234.5678.90ab.ceef+1234.5678.90ab.ceef",
-				Major: 123, Minor: 456, Patch: 789,
+				Prefix: "ver",
+				Major:  123, Minor: 456, Patch: 789,
 				PreRelease: []string{"1234", "5678", "90ab", "ceef"},
 				Build:      []string{"1234", "5678", "90ab", "ceef"},
 			},
@@ -124,8 +115,8 @@ func TestParse(t *testing.T) {
 		{
 			input: "v1.2.15-rc.1+build20190907",
 			expectedValue: &Version{
-				Prefix: "v", Version: "1.2.15-rc.1+build20190907",
-				Major: 1, Minor: 2, Patch: 15,
+				Prefix: "v",
+				Major:  1, Minor: 2, Patch: 15,
 				PreRelease: []string{"rc", "1"},
 				Build:      []string{"build20190907"},
 			},
@@ -133,9 +124,8 @@ func TestParse(t *testing.T) {
 		{
 			input: "pppppppppppppppp9999999999999999.9999999999999999.9999999999999999-1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc+1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc",
 			expectedValue: &Version{
-				Prefix:  "pppppppppppppppp",
-				Version: "9999999999999999.9999999999999999.9999999999999999-1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc+1111111111111111.2222222222222222.3333333333333333.aaaaaaaaaaaaaaaa.bbbbbbbbbbbbbbbb.cccccccccccccccc",
-				Major:   9999999999999999, Minor: 9999999999999999, Patch: 9999999999999999,
+				Prefix: "pppppppppppppppp",
+				Major:  9999999999999999, Minor: 9999999999999999, Patch: 9999999999999999,
 				PreRelease: []string{"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"},
 				Build:      []string{"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"},
 			},

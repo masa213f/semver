@@ -66,14 +66,14 @@ func main() {
 
 	if cmdOpt.isPreRelease {
 		if !ver.IsPreRelease() {
-			fmt.Fprintf(os.Stderr, "official version: version = %s\n", ver.Version)
+			fmt.Fprintf(os.Stderr, "official version: version = %s\n", ver.ToString())
 			os.Exit(exitStatusConditionFailure)
 		}
 		outOpt.displayPreRelease = true
 	}
 	if cmdOpt.hasBuildMeta {
 		if !ver.HasBuildMeta() {
-			fmt.Fprintf(os.Stderr, "no build metadata: version = %s\n", ver.Version)
+			fmt.Fprintf(os.Stderr, "no build metadata: version = %s\n", ver.ToString())
 			os.Exit(exitStatusConditionFailure)
 		}
 		outOpt.displayBuildMeta = true

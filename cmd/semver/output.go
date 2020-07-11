@@ -25,7 +25,6 @@ func newOutputOption() *outputOption {
 
 type outputVersion struct {
 	Prefix     *string  `json:"prefix,omitempty"`
-	Version    *string  `json:"version,omitempty"`
 	Major      *uint64  `json:"major,omitempty"`
 	Minor      *uint64  `json:"minor,omitempty"`
 	Patch      *uint64  `json:"patch,omitempty"`
@@ -39,7 +38,6 @@ func newOutputVersion(ver *semver.Version, opt *outputOption) *outputVersion {
 		if ver.Prefix != "" {
 			out.Prefix = &ver.Prefix
 		}
-		out.Version = &ver.Version
 		out.Major = &ver.Major
 		out.Minor = &ver.Minor
 		out.Patch = &ver.Patch
@@ -64,9 +62,6 @@ func outputText(o io.Writer, ver *semver.Version, opt *outputOption) {
 
 	if out.Prefix != nil {
 		fmt.Fprintf(o, "prefix: %s\n", *out.Prefix)
-	}
-	if out.Version != nil {
-		fmt.Fprintf(o, "version: %s\n", *out.Version)
 	}
 
 	if out.Major != nil {
