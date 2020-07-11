@@ -9,13 +9,6 @@ type cmdlineOption struct {
 	target       string
 }
 
-func (opt *cmdlineOption) isConditionCheck() bool {
-	if opt.isPreRelease || opt.hasBuildMeta {
-		return true
-	}
-	return false
-}
-
 const usage = `"semver" is a command-line tool for parsing "Semantic Versioning 2.0.0".
 
 Usage:

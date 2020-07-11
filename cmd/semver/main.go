@@ -52,38 +52,24 @@ func main() {
 		os.Exit(exitStatusParseFailure)
 	}
 
-	if !cmdOpt.isConditionCheck() {
-		// output all fields
-		if cmdOpt.jsonOutput {
-			outputJSON(os.Stdout, ver, nil)
-		} else {
-			outputText(os.Stdout, ver, nil)
-		}
-		os.Exit(exitStatusSuccess)
-	}
-
-	outOpt := newOutputOption()
-
 	if cmdOpt.isPreRelease {
 		if !ver.IsPreRelease() {
-			fmt.Fprintf(os.Stderr, "official version: version = %s\n", ver.ToString())
+			fmt.Fprintln(os.Stderr, "not pre-release version")
 			os.Exit(exitStatusConditionFailure)
 		}
-		outOpt.displayPreRelease = true
 	}
 	if cmdOpt.hasBuildMeta {
 		if !ver.HasBuildMeta() {
-			fmt.Fprintf(os.Stderr, "no build metadata: version = %s\n", ver.ToString())
+			fmt.Fprintln(os.Stderr, "no build metadata")
 			os.Exit(exitStatusConditionFailure)
 		}
-		outOpt.displayBuildMeta = true
 	}
 
-	// output selected fields
+	outOpt := newOutputOption()
 	if cmdOpt.jsonOutput {
-		outputJSON(os.Stdout, ver, outOpt)
-	} else {
-		outputText(os.Stdout, ver, outOpt)
+		outOpt.format = "json"
 	}
+	output(os.Stdout, ver, outOpt)
+
 	os.Exit(exitStatusSuccess)
 }

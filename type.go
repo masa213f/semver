@@ -46,3 +46,16 @@ func (v *Version) ToString() string {
 	}
 	return str
 }
+
+// Copy returns a copy of the Version.
+func (v *Version) Copy() *Version {
+	ret := Version{
+		Prefix:     v.Prefix,
+		Major:      v.Major,
+		Minor:      v.Minor,
+		Patch:      v.Patch,
+		PreRelease: v.PreRelease[:],
+		Build:      v.Build[:],
+	}
+	return &ret
+}
