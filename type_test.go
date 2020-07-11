@@ -10,13 +10,21 @@ func TestVersion(t *testing.T) {
 		input        *Version
 		isPreRelease bool
 		hasBuildMeta bool
+		toString     string
 	}{
 		{
-			input: &Version{
-				PreRelease: []string{"0"},
-			},
-			isPreRelease: true,
+			input:        &Version{},
+			isPreRelease: false,
 			hasBuildMeta: false,
+			toString:     "0.0.0",
+		},
+		{
+			input: &Version{
+				Prefix: "version",
+			},
+			isPreRelease: false,
+			hasBuildMeta: false,
+			toString:     "version0.0.0",
 		},
 		{
 			input: &Version{
@@ -24,6 +32,7 @@ func TestVersion(t *testing.T) {
 			},
 			isPreRelease: true,
 			hasBuildMeta: false,
+			toString:     "0.0.0-rc",
 		},
 		{
 			input: &Version{
@@ -31,6 +40,7 @@ func TestVersion(t *testing.T) {
 			},
 			isPreRelease: true,
 			hasBuildMeta: false,
+			toString:     "0.0.0-rc.0",
 		},
 		{
 			input: &Version{
@@ -38,6 +48,7 @@ func TestVersion(t *testing.T) {
 			},
 			isPreRelease: false,
 			hasBuildMeta: true,
+			toString:     "0.0.0+foo",
 		},
 		{
 			input: &Version{
@@ -45,47 +56,18 @@ func TestVersion(t *testing.T) {
 			},
 			isPreRelease: false,
 			hasBuildMeta: true,
-		},
-		{
-			input:        &Version{},
-			isPreRelease: false,
-			hasBuildMeta: false,
+			toString:     "0.0.0+foo.bar",
 		},
 		{
 			input: &Version{
-				Version: "0.0.0-0+0",
-				Major:   0, Minor: 0, Patch: 0,
-			},
-			isPreRelease: false,
-			hasBuildMeta: false,
-		},
-		{
-			input: &Version{
-				Version: "0.0.0-0+0",
-				Major:   0, Minor: 0, Patch: 0,
-				PreRelease: []string{"0"},
-			},
-			isPreRelease: true,
-			hasBuildMeta: false,
-		},
-		{
-			input: &Version{
-				Version: "0.0.0-0+0",
-				Major:   0, Minor: 0, Patch: 0,
-				Build: []string{"0"},
-			},
-			isPreRelease: false,
-			hasBuildMeta: true,
-		},
-		{
-			input: &Version{
-				Version: "0.0.0-0+0",
-				Major:   0, Minor: 0, Patch: 0,
-				PreRelease: []string{"0"},
-				Build:      []string{"0"},
+				Prefix: "v",
+				Major:  1, Minor: 2, Patch: 3,
+				PreRelease: []string{"rc.0"},
+				Build:      []string{"foo", "bar"},
 			},
 			isPreRelease: true,
 			hasBuildMeta: true,
+			toString:     "v1.2.3-rc.0+foo.bar",
 		},
 	}
 	for no, tc := range testcase {
@@ -101,6 +83,13 @@ func TestVersion(t *testing.T) {
 				actual := tc.input.HasBuildMeta()
 				if actual != tc.hasBuildMeta {
 					t.Errorf("expected=%t, actual=%t", tc.hasBuildMeta, actual)
+					return
+				}
+			})
+			t.Run("ToString", func(t *testing.T) {
+				actual := tc.input.ToString()
+				if actual != tc.toString {
+					t.Errorf("expected=%s, actual=%s", tc.toString, actual)
 					return
 				}
 			})

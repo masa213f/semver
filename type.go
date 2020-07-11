@@ -36,14 +36,14 @@ func (v *Version) HasBuildMeta() bool {
 	return len(v.Build) != 0
 }
 
-// String returns a string representation of the Version.
-func (v *Version) String() string {
+// ToString returns a string representation of the Version.
+func (v *Version) ToString() string {
 	str := fmt.Sprintf("%s%d.%d.%d", v.Prefix, v.Major, v.Minor, v.Patch)
 	if v.IsPreRelease() {
 		str += "-" + strings.Join(v.PreRelease, ".")
 	}
 	if v.HasBuildMeta() {
-		str += "-" + strings.Join(v.Build, ".")
+		str += "+" + strings.Join(v.Build, ".")
 	}
 	return str
 }
