@@ -57,35 +57,24 @@ func parseCoreVersion(part, str string) (uint64, error) {
 	return 0, errors.New("unexpected error")
 }
 
-func parsePreRelease(str string) ([]PreReleaseID, error) {
+func parsePreRelease(str string) ([]string, error) {
 	if str == "" {
 		return nil, nil
 	}
-	tmp := strings.Split(str, ".")
-	ids := make([]PreReleaseID, len(tmp))
-	for i, str := range tmp {
-		switch identifierType(str) {
-		case stringIdentifier:
-			ids[i].String = str
-		case numberIdentifier:
-			ids[i].Number = parseUint(str)
-		case invalidIdentifier:
+	ret := strings.Split(str, ".")
+	for i, str := range ret {
+		if identifierType(str) == invalidIdentifier {
 			return nil, newInvalidNumericError("prerelease["+strconv.Itoa(i)+"]", str)
 		}
 	}
-	return ids, nil
+	return ret, nil
 }
 
-func parseBuild(str string) []BuildID {
+func parseBuild(str string) []string {
 	if str == "" {
 		return nil
 	}
-	tmp := strings.Split(str, ".")
-	ids := make([]BuildID, len(tmp))
-	for i, id := range tmp {
-		ids[i] = BuildID(id)
-	}
-	return ids
+	return strings.Split(str, ".")
 }
 
 // Parse parses "Semantic Versioning 2.0.0".

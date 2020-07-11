@@ -45,18 +45,10 @@ func newOutputVersion(ver *semver.Version, opt *outputOption) *outputVersion {
 		out.Patch = &ver.Patch
 	}
 	if (opt == nil || opt.displayPreRelease) && len(ver.PreRelease) != 0 {
-		s := []string{}
-		for _, pr := range ver.PreRelease {
-			s = append(s, pr.ToString())
-		}
-		out.PreRelease = s
+		out.PreRelease = ver.PreRelease
 	}
 	if (opt == nil || opt.displayBuildMeta) && len(ver.Build) != 0 {
-		s := []string{}
-		for _, b := range ver.Build {
-			s = append(s, string(b))
-		}
-		out.Build = s
+		out.Build = ver.Build
 	}
 	return &out
 }

@@ -13,35 +13,35 @@ func TestVersion(t *testing.T) {
 	}{
 		{
 			input: &Version{
-				PreRelease: []PreReleaseID{{Number: 0}},
+				PreRelease: []string{"0"},
 			},
 			isPreRelease: true,
 			hasBuildMeta: false,
 		},
 		{
 			input: &Version{
-				PreRelease: []PreReleaseID{{String: "rc"}},
+				PreRelease: []string{"rc"},
 			},
 			isPreRelease: true,
 			hasBuildMeta: false,
 		},
 		{
 			input: &Version{
-				PreRelease: []PreReleaseID{{String: "rc"}, {Number: 0}},
+				PreRelease: []string{"rc", "0"},
 			},
 			isPreRelease: true,
 			hasBuildMeta: false,
 		},
 		{
 			input: &Version{
-				Build: []BuildID{"foo"},
+				Build: []string{"foo"},
 			},
 			isPreRelease: false,
 			hasBuildMeta: true,
 		},
 		{
 			input: &Version{
-				Build: []BuildID{"foo", "bar"},
+				Build: []string{"foo", "bar"},
 			},
 			isPreRelease: false,
 			hasBuildMeta: true,
@@ -63,7 +63,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Version: "0.0.0-0+0",
 				Major:   0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{Number: 0}},
+				PreRelease: []string{"0"},
 			},
 			isPreRelease: true,
 			hasBuildMeta: false,
@@ -72,7 +72,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Version: "0.0.0-0+0",
 				Major:   0, Minor: 0, Patch: 0,
-				Build: []BuildID{"0"},
+				Build: []string{"0"},
 			},
 			isPreRelease: false,
 			hasBuildMeta: true,
@@ -81,8 +81,8 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Version: "0.0.0-0+0",
 				Major:   0, Minor: 0, Patch: 0,
-				PreRelease: []PreReleaseID{{Number: 0}},
-				Build:      []BuildID{"0"},
+				PreRelease: []string{"0"},
+				Build:      []string{"0"},
 			},
 			isPreRelease: true,
 			hasBuildMeta: true,
@@ -106,60 +106,5 @@ func TestVersion(t *testing.T) {
 			})
 		})
 
-	}
-}
-
-func TestPreReleaseID(t *testing.T) {
-	testcase := []struct {
-		input    *PreReleaseID
-		isNumber bool
-		toString string
-	}{
-		{
-			input:    &PreReleaseID{},
-			isNumber: true,
-			toString: "0",
-		},
-		{
-			input: &PreReleaseID{
-				Number: 1,
-			},
-			isNumber: true,
-			toString: "1",
-		},
-		{
-			input: &PreReleaseID{
-				String: "1",
-			},
-			isNumber: false,
-			toString: "1",
-		},
-		{
-			// invalid case
-			input: &PreReleaseID{
-				Number: 1,
-				String: "1",
-			},
-			isNumber: false,
-			toString: "1",
-		},
-	}
-	for no, tc := range testcase {
-		t.Run(strconv.Itoa(no), func(t *testing.T) {
-			t.Run("IsNumber", func(t *testing.T) {
-				actual := tc.input.IsNumber()
-				if actual != tc.isNumber {
-					t.Errorf("expected=%t, actual=%t", tc.isNumber, actual)
-					return
-				}
-			})
-			t.Run("ToString", func(t *testing.T) {
-				actual := tc.input.ToString()
-				if actual != tc.toString {
-					t.Errorf("expected=%s, actual=%s", tc.toString, actual)
-					return
-				}
-			})
-		})
 	}
 }
