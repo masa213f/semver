@@ -65,11 +65,14 @@ func main() {
 		}
 	}
 
+	if cmdOpt.format != "" {
+		fmt.Fprintln(os.Stdout, ver.Format(cmdOpt.format))
+		os.Exit(exitStatusSuccess)
+	}
 	outOpt := newOutputOption()
 	if cmdOpt.jsonOutput {
 		outOpt.format = "json"
 	}
 	output(os.Stdout, ver, outOpt)
-
 	os.Exit(exitStatusSuccess)
 }

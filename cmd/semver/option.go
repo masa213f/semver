@@ -7,6 +7,7 @@ type cmdlineOption struct {
 	hasMetadata  bool
 	jsonOutput   bool
 	target       string
+	format       string
 }
 
 const usage = `"semver" is a command-line tool for parsing "Semantic Versioning 2.0.0".
@@ -16,12 +17,13 @@ Usage:
 
 Condition options:
   -p, --is-prerelease
-                    Check the version is a prerelease version
+                    check the version is a prerelease version
   -m, --has-metadata
-                    Check the version has metadata
+                    check the version has metadata
 
 Output options:
-  --json            output in JSON format (2-space indentation)
+  -j, --json        output in JSON format (2-space indentation)
+  -f, --format <format>
 
 Other options:
   -?, -h, --help    display this help and exit
@@ -41,8 +43,11 @@ func parseOptions(args []string) (*cmdlineOption, error) {
 		case "-m", "--has-metadata":
 			opt.hasMetadata = true
 		// output options
-		case "--json":
+		case "-j", "--json":
 			opt.jsonOutput = true
+		case "-f", "--format":
+			i++
+			opt.format = args[i]
 		// other options
 		case "-?", "-h", "--help":
 			opt.showUsage = true

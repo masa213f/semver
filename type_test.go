@@ -86,14 +86,13 @@ func TestVersion(t *testing.T) {
 					return
 				}
 			})
-			t.Run("ToString", func(t *testing.T) {
-				actual := tc.input.ToString()
+			t.Run("String", func(t *testing.T) {
+				actual := tc.input.String()
 				if actual != tc.toString {
 					t.Errorf("expected=%s, actual=%s", tc.toString, actual)
 					return
 				}
 			})
 		})
-
 	}
 }
