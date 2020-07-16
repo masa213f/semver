@@ -9,13 +9,13 @@ func TestVersion(t *testing.T) {
 	testcase := []struct {
 		input        *Version
 		isPreRelease bool
-		hasBuildMeta bool
+		hasMetadata  bool
 		toString     string
 	}{
 		{
 			input:        &Version{},
 			isPreRelease: false,
-			hasBuildMeta: false,
+			hasMetadata:  false,
 			toString:     "0.0.0",
 		},
 		{
@@ -23,66 +23,66 @@ func TestVersion(t *testing.T) {
 				Prefix: "version",
 			},
 			isPreRelease: false,
-			hasBuildMeta: false,
+			hasMetadata:  false,
 			toString:     "version0.0.0",
 		},
 		{
 			input: &Version{
-				PreRelease: []string{"rc"},
+				Prerelease: []string{"rc"},
 			},
 			isPreRelease: true,
-			hasBuildMeta: false,
+			hasMetadata:  false,
 			toString:     "0.0.0-rc",
 		},
 		{
 			input: &Version{
-				PreRelease: []string{"rc", "0"},
+				Prerelease: []string{"rc", "0"},
 			},
 			isPreRelease: true,
-			hasBuildMeta: false,
+			hasMetadata:  false,
 			toString:     "0.0.0-rc.0",
 		},
 		{
 			input: &Version{
-				Build: []string{"foo"},
+				Metadata: []string{"foo"},
 			},
 			isPreRelease: false,
-			hasBuildMeta: true,
+			hasMetadata:  true,
 			toString:     "0.0.0+foo",
 		},
 		{
 			input: &Version{
-				Build: []string{"foo", "bar"},
+				Metadata: []string{"foo", "bar"},
 			},
 			isPreRelease: false,
-			hasBuildMeta: true,
+			hasMetadata:  true,
 			toString:     "0.0.0+foo.bar",
 		},
 		{
 			input: &Version{
 				Prefix: "v",
 				Major:  1, Minor: 2, Patch: 3,
-				PreRelease: []string{"rc.0"},
-				Build:      []string{"foo", "bar"},
+				Prerelease: []string{"rc.0"},
+				Metadata:   []string{"foo", "bar"},
 			},
 			isPreRelease: true,
-			hasBuildMeta: true,
+			hasMetadata:  true,
 			toString:     "v1.2.3-rc.0+foo.bar",
 		},
 	}
 	for no, tc := range testcase {
 		t.Run(strconv.Itoa(no), func(t *testing.T) {
 			t.Run("IsPreRelease", func(t *testing.T) {
-				actual := tc.input.IsPreRelease()
+				actual := tc.input.IsPrerelease()
 				if actual != tc.isPreRelease {
 					t.Errorf("expected=%t, actual=%t", tc.isPreRelease, actual)
 					return
 				}
 			})
-			t.Run("HasBuildMeta", func(t *testing.T) {
-				actual := tc.input.HasBuildMeta()
-				if actual != tc.hasBuildMeta {
-					t.Errorf("expected=%t, actual=%t", tc.hasBuildMeta, actual)
+			t.Run("HasMetadata", func(t *testing.T) {
+				actual := tc.input.HasMetadata()
+				if actual != tc.hasMetadata {
+					t.Errorf("expected=%t, actual=%t", tc.hasMetadata, actual)
 					return
 				}
 			})

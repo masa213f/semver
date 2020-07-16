@@ -12,9 +12,9 @@ const (
 	alnumRegexp        = "[0-9A-Za-z-]{1,16}"
 	prefixRegexp       = "[^0-9]{0,16}"
 	versionCoreRegexp  = "(" + digitRegexp + ")\\.(" + digitRegexp + ")\\.(" + digitRegexp + ")"
-	preReleaseRegexp   = "(" + alnumRegexp + "(\\." + alnumRegexp + "){0,5})"
-	buildRegexp        = "(" + alnumRegexp + "(\\." + alnumRegexp + "){0,5})"
-	validVersionRegexp = "^(" + prefixRegexp + ")(" + versionCoreRegexp + "(-" + preReleaseRegexp + ")?" + "(\\+" + buildRegexp + ")?)$"
+	prereleaseRegexp   = "(" + alnumRegexp + "(\\." + alnumRegexp + "){0,5})"
+	metadataRegexp     = "(" + alnumRegexp + "(\\." + alnumRegexp + "){0,5})"
+	validVersionRegexp = "^(" + prefixRegexp + ")(" + versionCoreRegexp + "(-" + prereleaseRegexp + ")?" + "(\\+" + metadataRegexp + ")?)$"
 	validNumericRegexp = "^(" + digitRegexp + ")$"
 
 	// <Prefix:Max16><Mmajor:Max16>.<Minor:Max16>.<Patch:Max16>-<PreRelease1:Max16>.(snip).<PreRelease6:Max16>+<Build1:Max16>.(snip).<Build6:Max16>
@@ -57,7 +57,7 @@ func parseCoreVersion(part, str string) (uint64, error) {
 	return 0, errors.New("unexpected error")
 }
 
-func parsePreRelease(str string) ([]string, error) {
+func parsePrerelease(str string) ([]string, error) {
 	if str == "" {
 		return nil, nil
 	}
@@ -70,7 +70,7 @@ func parsePreRelease(str string) ([]string, error) {
 	return ret, nil
 }
 
-func parseBuild(str string) []string {
+func parseMetadata(str string) []string {
 	if str == "" {
 		return nil
 	}
@@ -108,12 +108,12 @@ func Parse(str string) (*Version, error) {
 	}
 	ver.Patch = patch
 
-	pre, err := parsePreRelease(submatch[7])
+	pre, err := parsePrerelease(submatch[7])
 	if err != nil {
 		return nil, newParseError(err.Error())
 	}
-	ver.PreRelease = pre
+	ver.Prerelease = pre
 
-	ver.Build = parseBuild(submatch[10])
+	ver.Metadata = parseMetadata(submatch[10])
 	return ver, nil
 }

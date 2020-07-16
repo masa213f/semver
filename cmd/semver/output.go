@@ -11,16 +11,16 @@ import (
 
 type outputOption struct {
 	stripPrefix     bool
-	stripPreRelease bool
-	stripBuildMeta  bool
+	stripPrerelease bool
+	stripMetadata   bool
 	format          string
 }
 
 func newOutputOption() *outputOption {
 	return &outputOption{
 		stripPrefix:     false,
-		stripPreRelease: false,
-		stripBuildMeta:  false,
+		stripPrerelease: false,
+		stripMetadata:   false,
 		format:          "text",
 	}
 }
@@ -30,11 +30,11 @@ func output(o io.Writer, ver *semver.Version, opt *outputOption) {
 	if opt.stripPrefix {
 		out.Prefix = ""
 	}
-	if opt.stripPreRelease {
-		out.PreRelease = nil
+	if opt.stripPrerelease {
+		out.Prerelease = nil
 	}
-	if opt.stripBuildMeta {
-		out.Build = nil
+	if opt.stripMetadata {
+		out.Metadata = nil
 	}
 
 	switch opt.format {
@@ -52,11 +52,11 @@ func outputText(o io.Writer, ver *semver.Version, opt *outputOption) {
 	fmt.Fprintf(o, "major, %d\n", ver.Major)
 	fmt.Fprintf(o, "minor, %d\n", ver.Minor)
 	fmt.Fprintf(o, "patch, %d\n", ver.Patch)
-	if ver.IsPreRelease() {
-		fmt.Fprintf(o, "prerelease, %s\n", strings.Join(ver.PreRelease, ", "))
+	if ver.IsPrerelease() {
+		fmt.Fprintf(o, "prerelease, %s\n", strings.Join(ver.Prerelease, ", "))
 	}
-	if ver.HasBuildMeta() {
-		fmt.Fprintf(o, "build, %s\n", strings.Join(ver.Build, ", "))
+	if ver.HasMetadata() {
+		fmt.Fprintf(o, "metadata, %s\n", strings.Join(ver.Metadata, ", "))
 	}
 }
 

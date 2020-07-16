@@ -22,19 +22,19 @@ func cmpValue(o1, o2 *Version) bool {
 	if o1.Patch != o2.Patch {
 		return false
 	}
-	if len(o1.PreRelease) != len(o2.PreRelease) {
+	if len(o1.Prerelease) != len(o2.Prerelease) {
 		return false
 	}
-	for i := range o1.PreRelease {
-		if o1.PreRelease[i] != o2.PreRelease[i] {
+	for i := range o1.Prerelease {
+		if o1.Prerelease[i] != o2.Prerelease[i] {
 			return false
 		}
 	}
-	if len(o1.Build) != len(o2.Build) {
+	if len(o1.Metadata) != len(o2.Metadata) {
 		return false
 	}
-	for i := range o1.Build {
-		if o1.Build[i] != o2.Build[i] {
+	for i := range o1.Metadata {
+		if o1.Metadata[i] != o2.Metadata[i] {
 			return false
 		}
 	}
@@ -71,36 +71,36 @@ func TestParse(t *testing.T) {
 			input: "0.0.0-0",
 			expectedValue: &Version{
 				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []string{"0"},
+				Prerelease: []string{"0"},
 			},
 		},
 		{
 			input: "0.0.0--",
 			expectedValue: &Version{
 				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []string{"-"},
+				Prerelease: []string{"-"},
 			},
 		},
 		{
 			input: "0.0.0+0",
 			expectedValue: &Version{
 				Major: 0, Minor: 0, Patch: 0,
-				Build: []string{"0"},
+				Metadata: []string{"0"},
 			},
 		},
 		{
 			input: "0.0.0+0-0",
 			expectedValue: &Version{
 				Major: 0, Minor: 0, Patch: 0,
-				Build: []string{"0-0"},
+				Metadata: []string{"0-0"},
 			},
 		},
 		{
 			input: "0.0.0-0+0",
 			expectedValue: &Version{
 				Major: 0, Minor: 0, Patch: 0,
-				PreRelease: []string{"0"},
-				Build:      []string{"0"},
+				Prerelease: []string{"0"},
+				Metadata:   []string{"0"},
 			},
 		},
 		{
@@ -108,8 +108,8 @@ func TestParse(t *testing.T) {
 			expectedValue: &Version{
 				Prefix: "ver",
 				Major:  123, Minor: 456, Patch: 789,
-				PreRelease: []string{"1234", "5678", "90ab", "ceef"},
-				Build:      []string{"1234", "5678", "90ab", "ceef"},
+				Prerelease: []string{"1234", "5678", "90ab", "ceef"},
+				Metadata:   []string{"1234", "5678", "90ab", "ceef"},
 			},
 		},
 		{
@@ -117,8 +117,8 @@ func TestParse(t *testing.T) {
 			expectedValue: &Version{
 				Prefix: "v",
 				Major:  1, Minor: 2, Patch: 15,
-				PreRelease: []string{"rc", "1"},
-				Build:      []string{"build20190907"},
+				Prerelease: []string{"rc", "1"},
+				Metadata:   []string{"build20190907"},
 			},
 		},
 		{
@@ -126,8 +126,8 @@ func TestParse(t *testing.T) {
 			expectedValue: &Version{
 				Prefix: "pppppppppppppppp",
 				Major:  9999999999999999, Minor: 9999999999999999, Patch: 9999999999999999,
-				PreRelease: []string{"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"},
-				Build:      []string{"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"},
+				Prerelease: []string{"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"},
+				Metadata:   []string{"1111111111111111", "2222222222222222", "3333333333333333", "aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"},
 			},
 		},
 

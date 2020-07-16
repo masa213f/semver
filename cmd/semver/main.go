@@ -53,14 +53,14 @@ func main() {
 	}
 
 	if cmdOpt.isPreRelease {
-		if !ver.IsPreRelease() {
-			fmt.Fprintln(os.Stderr, "not pre-release version")
+		if !ver.IsPrerelease() {
+			fmt.Fprintln(os.Stderr, "not prerelease version")
 			os.Exit(exitStatusConditionFailure)
 		}
 	}
 	if cmdOpt.hasBuildMeta {
-		if !ver.HasBuildMeta() {
-			fmt.Fprintln(os.Stderr, "no build metadata")
+		if !ver.HasMetadata() {
+			fmt.Fprintln(os.Stderr, "no metadata")
 			os.Exit(exitStatusConditionFailure)
 		}
 	}
