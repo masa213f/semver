@@ -8,13 +8,13 @@ import (
 func TestVersion(t *testing.T) {
 	testcase := []struct {
 		input        *Version
-		isPreRelease bool
+		isPrerelease bool
 		hasMetadata  bool
 		toString     string
 	}{
 		{
 			input:        &Version{},
-			isPreRelease: false,
+			isPrerelease: false,
 			hasMetadata:  false,
 			toString:     "0.0.0",
 		},
@@ -22,7 +22,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Prefix: "version",
 			},
-			isPreRelease: false,
+			isPrerelease: false,
 			hasMetadata:  false,
 			toString:     "version0.0.0",
 		},
@@ -30,7 +30,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Prerelease: []string{"rc"},
 			},
-			isPreRelease: true,
+			isPrerelease: true,
 			hasMetadata:  false,
 			toString:     "0.0.0-rc",
 		},
@@ -38,7 +38,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Prerelease: []string{"rc", "0"},
 			},
-			isPreRelease: true,
+			isPrerelease: true,
 			hasMetadata:  false,
 			toString:     "0.0.0-rc.0",
 		},
@@ -46,7 +46,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Metadata: []string{"foo"},
 			},
-			isPreRelease: false,
+			isPrerelease: false,
 			hasMetadata:  true,
 			toString:     "0.0.0+foo",
 		},
@@ -54,7 +54,7 @@ func TestVersion(t *testing.T) {
 			input: &Version{
 				Metadata: []string{"foo", "bar"},
 			},
-			isPreRelease: false,
+			isPrerelease: false,
 			hasMetadata:  true,
 			toString:     "0.0.0+foo.bar",
 		},
@@ -65,17 +65,17 @@ func TestVersion(t *testing.T) {
 				Prerelease: []string{"rc.0"},
 				Metadata:   []string{"foo", "bar"},
 			},
-			isPreRelease: true,
+			isPrerelease: true,
 			hasMetadata:  true,
 			toString:     "v1.2.3-rc.0+foo.bar",
 		},
 	}
 	for no, tc := range testcase {
 		t.Run(strconv.Itoa(no), func(t *testing.T) {
-			t.Run("IsPreRelease", func(t *testing.T) {
+			t.Run("IsPrerelease", func(t *testing.T) {
 				actual := tc.input.IsPrerelease()
-				if actual != tc.isPreRelease {
-					t.Errorf("expected=%t, actual=%t", tc.isPreRelease, actual)
+				if actual != tc.isPrerelease {
+					t.Errorf("expected=%t, actual=%t", tc.isPrerelease, actual)
 					return
 				}
 			})

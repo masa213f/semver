@@ -3,8 +3,8 @@ package main
 type cmdlineOption struct {
 	showVersion  bool
 	showUsage    bool
-	isPreRelease bool
-	hasBuildMeta bool
+	isPrerelease bool
+	hasMetadata  bool
 	jsonOutput   bool
 	target       string
 }
@@ -16,9 +16,9 @@ Usage:
 
 Condition options:
   -p, --is-prerelease
-                    verify the version is a pre-release version and output the pre-release fields
-  -b, --has-buildmeta
-                    verify the version has build metadata and output the build metadata fields
+                    verify the version is a prerelease version and output the prerelease fields
+  -b, --has-metadata
+                    verify the version has metadata and output the metadata fields
 
 Output options:
   --json            output in JSON format (2-space indentation)
@@ -37,9 +37,9 @@ func parseOptions(args []string) (*cmdlineOption, error) {
 		switch o {
 		// Condition
 		case "-p", "--is-prerelease":
-			opt.isPreRelease = true
-		case "-b", "--has-buildmeta":
-			opt.hasBuildMeta = true
+			opt.isPrerelease = true
+		case "-b", "--has-metadata":
+			opt.hasMetadata = true
 		// output options
 		case "--json":
 			opt.jsonOutput = true

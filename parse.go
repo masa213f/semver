@@ -17,7 +17,7 @@ const (
 	validVersionRegexp = "^(" + prefixRegexp + ")(" + versionCoreRegexp + "(-" + prereleaseRegexp + ")?" + "(\\+" + metadataRegexp + ")?)$"
 	validNumericRegexp = "^(" + digitRegexp + ")$"
 
-	// <Prefix:Max16><Mmajor:Max16>.<Minor:Max16>.<Patch:Max16>-<PreRelease1:Max16>.(snip).<PreRelease6:Max16>+<Build1:Max16>.(snip).<Build6:Max16>
+	// <Prefix:Max16><Mmajor:Max16>.<Minor:Max16>.<Patch:Max16>-<Prerelease[0]:Max16>.(snip).<Prerelease[5]:Max16>+<Metadata[0]:Max16>.(snip).<Metadata[5]:Max16>
 	maxInputLength = 270
 )
 

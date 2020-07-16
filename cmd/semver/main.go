@@ -52,13 +52,13 @@ func main() {
 		os.Exit(exitStatusParseFailure)
 	}
 
-	if cmdOpt.isPreRelease {
+	if cmdOpt.isPrerelease {
 		if !ver.IsPrerelease() {
 			fmt.Fprintln(os.Stderr, "not prerelease version")
 			os.Exit(exitStatusConditionFailure)
 		}
 	}
-	if cmdOpt.hasBuildMeta {
+	if cmdOpt.hasMetadata {
 		if !ver.HasMetadata() {
 			fmt.Fprintln(os.Stderr, "no metadata")
 			os.Exit(exitStatusConditionFailure)

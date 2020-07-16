@@ -24,12 +24,12 @@ type Version struct {
 	Metadata   []string `json:"metadata,omitempty"`
 }
 
-// IsPrerelease determines whether the Version is a pre-release version.
+// IsPrerelease determines whether the Version is a prerelease version.
 func (v *Version) IsPrerelease() bool {
 	return len(v.Prerelease) != 0
 }
 
-// HasMetadata determines whether the Version has build metadata.
+// HasMetadata determines whether the Version has metadata.
 func (v *Version) HasMetadata() bool {
 	return len(v.Metadata) != 0
 }
