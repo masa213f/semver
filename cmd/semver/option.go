@@ -16,9 +16,9 @@ Usage:
 
 Condition options:
   -p, --is-prerelease
-                    verify the version is a prerelease version and output the prerelease fields
-  -b, --has-metadata
-                    verify the version has metadata and output the metadata fields
+                    Check the version is a prerelease version
+  -m, --has-metadata
+                    Check the version has metadata
 
 Output options:
   --json            output in JSON format (2-space indentation)
@@ -38,7 +38,7 @@ func parseOptions(args []string) (*cmdlineOption, error) {
 		// Condition
 		case "-p", "--is-prerelease":
 			opt.isPrerelease = true
-		case "-b", "--has-metadata":
+		case "-m", "--has-metadata":
 			opt.hasMetadata = true
 		// output options
 		case "--json":
