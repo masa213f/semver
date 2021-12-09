@@ -1,50 +1,49 @@
 VERSION = $(shell cat version.txt)
-TARGET = semver
-SOURCE = $(shell find . -type f -name "*.go" -not -name "*_test.go")
 
-all: build
+PROJECT_DIR := $(CURDIR)
+BIN_DIR := $(PROJECT_DIR)/bin
 
-setup:
-	go get -u golang.org/x/tools/cmd/goimports
-	go get -u golang.org/x/lint/golint
+GOIMPORTS := $(BIN_DIR)/goimports
+STATICCHECK := $(BIN_DIR)/staticcheck
+TARGET := $(BIN_DIR)/semver
 
-mod:
-	go mod tidy
-	go mod vendor
+.PHONY: all
+all: help
 
-build: mod $(TARGET)
+##@ Basic
+.PHONY: help
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-$(TARGET): $(SOURCE) version.txt
-	go build -o $(TARGET) -ldflags "-X main.version=$(VERSION)" ./cmd/$(TARGET)/...
+.PHONY: setup
+setup: ## Setup necessary tools.
+	mkdir -p $(BIN_DIR)
+	GOBIN=$(BIN_DIR) go install golang.org/x/tools/cmd/goimports@latest
+	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
 
-run: $(TARGET)
-	# Run the example commands in README.md.
-	@echo
-	./$(TARGET) v1.2.3-rc.0+build.20190925        ; echo "# => exit status: $$?"
-	@echo
-	./$(TARGET) v1.2.3-rc.0+build.20190925 --json ; echo "# => exit status: $$?"
-	@echo
-	./semver v1.12                                ; echo "# => exit status: $$?"
-	@echo
-	./semver v1.01.0                              ; echo "# => exit status: $$?"
-	@echo
-	./semver -p v1.1.2-rc.0                       ; echo "# => exit status: $$?"
-	@echo
-	./semver -p v1.1.2                            ; echo "# => exit status: $$?"
+.PHONY: clean
+clean: ## Clean files
+	-rm $(BIN_DIR)/*
+	-rmdir $(BIN_DIR)
 
-clean:
-	-rm $(TARGET)
+##@ Build
 
-distclean: clean
-	-rm go.sum
-	-rm -rf vendor
+.PHONY: build
+build: ## Build all binaries.
+	CGO_ENABLED=0 go build -o $(BIN_DIR)/ -trimpath -ldflags "-X main.version=$(VERSION)" ./cmd/semver
 
-fmt:
-	goimports -w $$(find . -type d -name 'vendor' -prune -o -type f -name '*.go' -print)
+.PHONY: format
+format: ## Format go files.
+	$(GOIMPORTS) -w $$(find . -name '*.pb.go' -prune -o -name '*.go' -print)
 
-test:
-	test -z "$$(goimports -l $$(find . -type d -name 'vendor' -prune -o -type f -name '*.go' -print) | tee /dev/stderr)"
-	test -z "$$(golint $$(go list ./... | grep -v '/vendor/') | tee /dev/stderr)"
+##@ Test
+
+.PHONY: lint
+lint:
+	test -z "$$($(GOIMPORTS) -l $$(find . -name '*.pb.go' -prune -o -name '*.go' -print) | tee /dev/stderr)"
+	$(STATICCHECK) ./...
+	go vet ./...
+
+.PHONY: test
+test: ## Run unit tests.
 	go test -v ./...
-
-.PHONY: all setup mod build run clean distclean fmt test

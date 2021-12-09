@@ -48,18 +48,12 @@ type Version struct {
 
 // IsPreRelease determines whether the Version is a pre-release version.
 func (v *Version) IsPreRelease() bool {
-	if len(v.PreRelease) == 0 {
-		return false
-	}
-	return true
+	return len(v.PreRelease) != 0
 }
 
 // HasBuildMeta determines whether the Version has build metadata.
 func (v *Version) HasBuildMeta() bool {
-	if len(v.Build) == 0 {
-		return false
-	}
-	return true
+	return len(v.Build) != 0
 }
 
 // PreReleaseID represents "dot-separated pre-release identifier".
@@ -72,10 +66,7 @@ type PreReleaseID struct {
 
 // IsNumber determines the PreReleaseID type.
 func (pr *PreReleaseID) IsNumber() bool {
-	if pr.String == "" {
-		return true
-	}
-	return false
+	return pr.String == ""
 }
 
 // ToString returns a string representation of the PreReleaseID.
