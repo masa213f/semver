@@ -1,4 +1,4 @@
-name: main
+name: Test
 on:
   pull_request:
   push:
@@ -6,8 +6,8 @@ on:
       - 'main'
 
 jobs:
-  build:
-    name: Build
+  test:
+    name: Test and Build
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -17,4 +17,4 @@ jobs:
       - run: make setup
       - run: make lint
       - run: make test
-      - run: make build
+      - run: make release-build
