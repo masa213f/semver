@@ -55,10 +55,7 @@ func cmpError(e1, e2 error) bool {
 	t1 := reflect.TypeOf(e1)
 	t2 := reflect.TypeOf(e2)
 
-	if t1 == t2 {
-		return true
-	}
-	return false
+	return t1 == t2
 }
 
 func TestParse(t *testing.T) {

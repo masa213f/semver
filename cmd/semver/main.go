@@ -26,7 +26,7 @@ func showVersion(o io.Writer) {
 }
 
 func showUsage(o io.Writer) {
-	fmt.Fprintf(o, usage)
+	fmt.Fprintln(o, usage)
 }
 
 func main() {
