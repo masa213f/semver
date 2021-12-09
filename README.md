@@ -1,23 +1,20 @@
 # semver
 
-`semver` は "[Semantic Versioning 2.0.0][semver-v2]" をパースするコマンドラインツールです。
+`semver` is a command-line tool to parse "[Semantic Versioning 2.0.0][semver-v2]".
 
-"Semantic Versioning 2.0.0" をコマンドラインで処理するツールがなかったので作成しました。
-CircleCI を使った GitHub プロジェクトの自動リリース等で、 バージョン番号のバリデーションに使用できます。
+## Install
 
-## インストール
-
-`semver` のインストールには Go が必要です。以下のように `go get` を実行してください。
+Go is required to install `semver`. Please run `go get` as follows.
 
 ```console
-$ go get -u github.com/masa213f/semver/cmd/semver
+$ go install github.com/masa213f/semver/cmd/semver@v0.1.0
 ```
 
-## 使用方法
+## Usage
 
-`semver` の引数に、バージョン番号(文字列)を指定してください。
-バージョン番号のパースが成功すると、以下のように結果が出力されます。
-この時、コマンドの終了ステータスとして `0` が返されます。
+Specify the version number (string) as the argument of `semver`.
+If the version number is parsed successfully, this command outputs the result as follows.
+At this time, `0` is returned as the exit status.
 
 ```console
 $ semver v1.2.3-rc.0+build.20190925
@@ -31,7 +28,7 @@ build: build.20190925
 # => exit status: 0
 ```
 
-`--json`オプションを指定すると、結果がJSON形式で出力されます。
+If you specify the `--json` option, the result will be output in JSON format.
 
 ```console
 $ semver v1.2.3-rc.0+build.20190925 --json
@@ -53,7 +50,7 @@ $ semver v1.2.3-rc.0+build.20190925 --json
 # => exit status: 0
 ```
 
-引数に指定された文字列が"Semantic Versioning 2.0.0"に従っていない場合は、終了ステータスとして`1`が返されます。
+If the argument does not follow "Semantic Versioning 2.0.0", `1` will be returned as the exit status.
 
 ```console
 $ semver v1.12
@@ -65,8 +62,7 @@ parse error: invalid numeric identifier (leading zeros): minor = 01
 # => exit status: 1
 ```
 
-また、`-p`(`--is-prerelease`) オプションを指定すると、プレリリースバージョンの判定ができます。
-プレリリースバージョンの場合は終了ステータス`0`、そうでない場合は終了ステータス`2`が返されます。
+You can also specify the `-p`(`--is-prerelease`) option to determine the pre-release version.
 
 ```console
 $ semver -p v1.1.2-rc.0
