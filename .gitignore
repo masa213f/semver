@@ -1,3 +1,4 @@
-/go.sum
-/vendor
-/bin
+go.sum
+vendor/
+bin/
+dist/

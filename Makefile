@@ -1,11 +1,10 @@
-VERSION = $(shell cat version.txt)
-
 PROJECT_DIR := $(CURDIR)
 BIN_DIR := $(PROJECT_DIR)/bin
+DIST_DIR := $(PROJECT_DIR)/dist
 
 GOIMPORTS := $(BIN_DIR)/goimports
 STATICCHECK := $(BIN_DIR)/staticcheck
-TARGET := $(BIN_DIR)/semver
+GORELEASER := $(BIN_DIR)/goreleaser
 
 .PHONY: all
 all: help
@@ -20,17 +19,22 @@ setup: ## Setup necessary tools.
 	mkdir -p $(BIN_DIR)
 	GOBIN=$(BIN_DIR) go install golang.org/x/tools/cmd/goimports@latest
 	GOBIN=$(BIN_DIR) go install honnef.co/go/tools/cmd/staticcheck@latest
+	GOBIN=$(BIN_DIR) go install github.com/goreleaser/goreleaser@latest
 
 .PHONY: clean
 clean: ## Clean files
-	-rm $(BIN_DIR)/*
-	-rmdir $(BIN_DIR)
+	-rm $(BIN_DIR)/* $(DIST_DIR)/*
+	-rmdir $(BIN_DIR) $(DIST_DIR)
 
 ##@ Build
 
 .PHONY: build
-build: ## Build all binaries.
-	CGO_ENABLED=0 go build -o $(BIN_DIR)/ -trimpath -ldflags "-X main.version=$(VERSION)" ./cmd/semver
+build: ## Build a binary.
+	$(GORELEASER) build --snapshot --rm-dist --single-target
+
+.PHONY: release-build
+release-build:
+	$(GORELEASER) build --snapshot --rm-dist
 
 .PHONY: format
 format: ## Format go files.
